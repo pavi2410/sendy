@@ -11,9 +11,11 @@
     "@mantine/core": "^4.0.9",
     "@mantine/dropzone": "^4.0.9",
     "@mantine/hooks": "^4.0.9",
-    "@supabase/supabase-js": "^1.32.2",
+    "firebase": "^9.6.10",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "react-firebase-hooks": "^5.0.3",
+    "react-qr-code": "^2.0.3"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^1.0.7",

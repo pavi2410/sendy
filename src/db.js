@@ -1,6 +1,17 @@
-import { createClient } from '@supabase/supabase-js'
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyCYrPpnmaUULHmsImiA4n9NtV2gDWsjpVQ",
+  authDomain: "sendy-a327c.firebaseapp.com",
+  projectId: "sendy-a327c",
+  storageBucket: "sendy-a327c.appspot.com",
+  messagingSenderId: "930104475372",
+  appId: "1:930104475372:web:004f3d3ff7e259a8032fc9"
+};
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Initialize Firebase
+export const fbApp = initializeApp(firebaseConfig);
