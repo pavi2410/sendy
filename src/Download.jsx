@@ -4,7 +4,7 @@ import { fbApp } from './db'
 import { getMetadata, getStorage, ref } from "firebase/storage";
 import { useDownloadURL } from "react-firebase-hooks/storage";
 import { useParams } from "react-router-dom"
-import { Box, Button, Center, Container, Group, Header, Loader, Stack, Text, Title, Footer, Anchor, Alert } from '@mantine/core';
+import { Box, Button, Center, Container, Group, Header, Loader, Stack, Text, Title, Footer, Anchor, Alert, Skeleton } from '@mantine/core';
 import prettyBytes from 'pretty-bytes';
 
 const storage = getStorage(fbApp);
@@ -72,8 +72,16 @@ export default function Download() {
 
 function FileInfo({ meta }) {
   if (!meta) {
-    return <Loader color="lime" variant="dots" />
+    return (
+      <Stack spacing="lg">
+        <Skeleton width="30ch" height="1rem" radius="xl" />
+        <Skeleton width="30ch" height="1rem" radius="xl" />
+        <Skeleton width="30ch" height="1rem" radius="xl" />
+        <Skeleton width="30ch" height="1rem" radius="xl" />
+      </Stack>
+    )
   }
+
   return (
     <Stack spacing="lg">
       <div>Name <b>{meta.customMetadata.realFileName}</b></div>
