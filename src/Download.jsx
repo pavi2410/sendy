@@ -4,7 +4,7 @@ import { fbApp } from './db'
 import { getMetadata, getStorage, ref } from "firebase/storage";
 import { useDownloadURL } from "react-firebase-hooks/storage";
 import { useParams } from "react-router-dom"
-import { Box, Button, Center, Container, Group, Header, Loader, Paper, Stack, Text, Title } from '@mantine/core';
+import { Box, Button, Center, Container, Group, Header, Loader, Stack, Text, Title, Footer, Anchor, Alert } from '@mantine/core';
 import prettyBytes from 'pretty-bytes';
 
 const storage = getStorage(fbApp);
@@ -25,11 +25,23 @@ export default function Download() {
   }, [fileRef])
 
   if (loading) {
-    return <Loader color="green" variant="dots" />
+    return (
+      <Center sx={{ height: '100vh' }}>
+        <Loader size="xl" variant="dots" />
+      </Center>
+    )
   }
+
   if (error) {
-    return <div>Invalid code</div>
+    return (
+      <Center sx={{ height: '100vh' }}>
+        <Alert title="Invalid Code" color="red" radius="md">
+          The code is invalid... Make sure you have the correct link.
+        </Alert>
+      </Center>
+    )
   }
+
   return (
     <Container>
       <Header height={60}>
