@@ -35,7 +35,7 @@ export default function Download() {
       <Header height={60}>
         <Group position="apart" sx={{ height: '100%' }} px={20}>
           <Title>sendy</Title>
-          <Button variant="light">Upload</Button>
+          <Button variant="light" component="a" href="/">Upload</Button>
         </Group>
       </Header>
       <Center sx={{ paddingTop: '1rem' }}>
