@@ -50,10 +50,10 @@ export default function Download() {
           <Button variant="light" component="a" href="/">Upload</Button>
         </Group>
       </Header>
-      <Center sx={{ paddingTop: '1rem' }}>
+      <Center sx={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
         <Box style={{ backgroundColor: "#f8fafc", borderRadius: '.5rem' }} p="xl">
           <FileInfo meta={meta} />
-          <Button color="dark" radius="md" size="md" fullWidth style={{ marginTop: '1rem' }} component="a" href={value} download>
+          <Button color="dark" radius="md" size="md" fullWidth style={{ marginTop: '1rem' }} component="a" href={value} download={meta?.customMetadata.realFileName ?? ''}>
             Download
           </Button>
         </Box>
