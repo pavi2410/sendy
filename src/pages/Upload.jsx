@@ -1,4 +1,4 @@
-import { AppShell, Button, Center, Group, Modal, Stack, Text, TextInput, Title } from '@mantine/core';
+import { AppShell, Button, Center, Modal, Stack, Text, TextInput, Title, ThemeIcon, Space } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import { useClipboard, useId } from '@mantine/hooks';
 import { getStorage, ref } from 'firebase/storage';
@@ -8,7 +8,7 @@ import QRCode from 'react-qr-code';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { fbApp } from '@/db';
-import { IconUpload } from '@tabler/icons';
+import { IconUpload, IconCheck } from '@tabler/icons';
 
 const storage = getStorage(fbApp);
 const storageRef = ref(storage)
@@ -79,7 +79,12 @@ function Receive({ id }) {
   const copyButton = <Button onClick={() => copy(url)} color={copied ? 'green' : ''}>{copied ? 'Copied' : 'Copy'}</Button>;
   return (
     <Stack spacing="md" p="xl">
-      <Title>File uploaded</Title>
+      <Title>
+        File uploaded&nbsp;
+        <ThemeIcon radius="xl" size="xl" color="green">
+          <IconCheck />
+        </ThemeIcon>
+      </Title>
       <TextInput label="Download Link" value={url} readOnly rightSection={copyButton} />
       <Center>
         <QRCode value={url} />
