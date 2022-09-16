@@ -54,18 +54,16 @@ function Send({ id, setOpened }) {
   return (
     <Center sx={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
       <Dropzone onDrop={onDrop} loading={uploading}>
-        {
-          (status) => (
-            <Box sx={{ padding: '4rem 2rem' }}>
-              <Text size="xl" inline>
-                Drop a file here or click to select file
-              </Text>
-              <Text size="sm" color="dimmed" inline mt={8}>
-                File size should not exceed 50MB
-              </Text>
-            </Box>
-          )
-        }
+        <Group position="center" spacing="xl" style={{ minHeight: 220, pointerEvents: 'none' }}>
+          <div>
+            <Text size="xl" inline>
+              Drop a file here or click to select file
+            </Text>
+            <Text size="sm" color="dimmed" inline mt={7}>
+              File size should not exceed 50MB
+            </Text>
+          </div>
+        </Group>
       </Dropzone>
     </Center>
   )
