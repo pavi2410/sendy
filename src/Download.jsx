@@ -1,11 +1,11 @@
 //@ts-check
-import { useEffect, useMemo, useState } from 'react';
-import { fbApp } from './db'
+import { Alert, AppShell, Box, Button, Center, Footer, Header, Loader, Skeleton, Stack } from '@mantine/core';
 import { getMetadata, getStorage, ref } from "firebase/storage";
-import { useDownloadURL } from "react-firebase-hooks/storage";
-import { useParams } from "react-router-dom"
-import { Box, Button, Center, Container, Group, Header, Loader, Stack, Text, Title, Footer, Anchor, Alert, Skeleton } from '@mantine/core';
 import prettyBytes from 'pretty-bytes';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useDownloadURL } from "react-firebase-hooks/storage";
+import { useParams } from "react-router-dom";
+import { fbApp } from './db';
 
 const storage = getStorage(fbApp);
 
@@ -43,13 +43,10 @@ export default function Download() {
   }
 
   return (
-    <Container>
-      <Header height={60}>
-        <Group position="apart" sx={{ height: '100%' }} px={20}>
-          <Title>sendy</Title>
-          <Button variant="light" component="a" href="/">Upload</Button>
-        </Group>
-      </Header>
+    <AppShell
+      header={<Header />}
+      footer={<Footer />}
+    >
       <Center sx={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
         <Box style={{ backgroundColor: "#f8fafc", borderRadius: '.5rem' }} p="xl">
           <FileInfo meta={meta} />
@@ -58,15 +55,7 @@ export default function Download() {
           </Button>
         </Box>
       </Center>
-      <Footer height={60}>
-        <Group position="apart" sx={{ height: '100%' }} px={20}>
-          <Text>Built by <Anchor href="https://pavi2410.me" target="_blank">
-            pavi2410
-          </Anchor></Text>
-          <Button variant="subtle" component={Anchor} href="https://github.com/pavi2410/sendy" target="_blank">Sauce</Button>
-        </Group>
-      </Footer>
-    </Container>
+    </AppShell>
   )
 }
 

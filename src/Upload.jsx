@@ -1,12 +1,14 @@
 //@ts-check
-import React, { useEffect, useState } from 'react'
-import { fbApp } from './db'
-import { Container, Title, Header, Group, Button, Footer, Text, Anchor, Center, Box, Modal, TextInput, Loader, Stack } from '@mantine/core'
-import { Dropzone } from '@mantine/dropzone'
+import { AppShell, Button, Center, Group, Modal, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Dropzone } from '@mantine/dropzone';
 import { useClipboard, useId } from '@mantine/hooks';
 import { getStorage, ref } from 'firebase/storage';
-import { useUploadFile } from 'react-firebase-hooks/storage'
+import React, { useEffect, useState } from 'react';
+import { useUploadFile } from 'react-firebase-hooks/storage';
 import QRCode from 'react-qr-code';
+import { Footer } from './components/Footer';
+import { Header } from './components/Header';
+import { fbApp } from './db';
 
 const storage = getStorage(fbApp);
 const storageRef = ref(storage)
@@ -18,12 +20,10 @@ export default function Upload() {
   const [opened, setOpened] = useState(false)
 
   return (
-    <Container>
-      <Header height={60}>
-        <Group position="apart" sx={{ height: '100%' }} px={20}>
-          <Title>sendy</Title>
-        </Group>
-      </Header>
+    <AppShell
+      header={<Header />}
+      footer={<Footer />}
+    >
       <Send id={id} setOpened={setOpened} />
       <Modal
         withCloseButton={false}
@@ -32,15 +32,7 @@ export default function Upload() {
         onClose={() => setOpened(false)}>
         <Receive id={id} />
       </Modal>
-      <Footer height={60}>
-        <Group position="apart" sx={{ height: '100%' }} px={20}>
-          <Text>Built by <Anchor href="https://pavi2410.me" target="_blank">
-            pavi2410
-          </Anchor></Text>
-          <Button variant="subtle" component={Anchor} href="https://github.com/pavi2410/sendy" target="_blank">Sauce</Button>
-        </Group>
-      </Footer>
-    </Container>
+    </AppShell>
   )
 }
 
