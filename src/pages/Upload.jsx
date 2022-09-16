@@ -19,7 +19,7 @@ export default function Upload() {
   const [opened, setOpened] = useState(false)
 
   return (
-    <AppShell
+    <AppShell fixed padding={10}
       header={<Header />}
       footer={<Footer />}
     >
