@@ -8,6 +8,7 @@ import QRCode from 'react-qr-code';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { fbApp } from '@/db';
+import { IconUpload } from '@tabler/icons';
 
 const storage = getStorage(fbApp);
 const storageRef = ref(storage)
@@ -46,17 +47,22 @@ function Send({ id, setOpened }) {
 
   return (
     <Center sx={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
-      <Dropzone onDrop={onDrop} loading={uploading}>
-        <Group position="center" spacing="xl" style={{ minHeight: 220, pointerEvents: 'none' }}>
-          <div>
-            <Text size="xl" inline>
-              Drop a file here or click to select file
-            </Text>
-            <Text size="sm" color="dimmed" inline mt={7}>
-              File size should not exceed 50MB
-            </Text>
-          </div>
-        </Group>
+      <Dropzone
+        maxFiles={1}
+        maxSize={50 * 1024 * 1024}
+        padding="xl"
+        onDrop={onDrop}
+        loading={uploading}
+      >
+        <Stack align="center" justify="center" spacing="lg" style={{ minHeight: 220, pointerEvents: 'none' }}>
+          <IconUpload size={48} />
+          <Text size="xl" inline>
+            Drop a file here or click to select file
+          </Text>
+          <Text size="sm" color="dimmed" inline mt={7}>
+            File size should not exceed 50MB
+          </Text>
+        </Stack>
       </Dropzone>
     </Center>
   )
