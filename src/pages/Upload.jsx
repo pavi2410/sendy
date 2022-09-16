@@ -27,7 +27,11 @@ export default function Upload() {
       <Send id={id} setOpened={setOpened} />
       <Modal
         withCloseButton={false}
-        centered
+        overlayOpacity={0.5}
+        overlayBlur={3}
+        transition="slide-up"
+        transitionDuration={300}
+        transitionTimingFunction="ease"
         opened={opened}
         onClose={() => setOpened(false)}>
         <Receive id={id} />
