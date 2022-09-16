@@ -1,5 +1,5 @@
 //@ts-check
-import { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { fbApp } from './db'
 import { Container, Title, Header, Group, Button, Footer, Text, Anchor, Center, Box, Modal, TextInput, Loader, Stack } from '@mantine/core'
 import { Dropzone } from '@mantine/dropzone'
@@ -12,7 +12,9 @@ const storage = getStorage(fbApp);
 const storageRef = ref(storage)
 
 export default function Upload() {
-  const id = useId(null, randomHex)
+  const id = useId(randomHex())
+  useEffect(() => console.log(id), [id])
+
   const [opened, setOpened] = useState(false)
 
   return (
