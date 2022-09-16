@@ -1,4 +1,3 @@
-//@ts-check
 import { AppShell, Button, Center, Group, Modal, Stack, Text, TextInput, Title } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import { useClipboard, useId } from '@mantine/hooks';
@@ -6,9 +5,9 @@ import { getStorage, ref } from 'firebase/storage';
 import React, { useEffect, useState } from 'react';
 import { useUploadFile } from 'react-firebase-hooks/storage';
 import QRCode from 'react-qr-code';
-import { Footer } from './components/Footer';
-import { Header } from './components/Header';
-import { fbApp } from './db';
+import { Footer } from '@/components/Footer';
+import { Header } from '@/components/Header';
+import { fbApp } from '@/db';
 
 const storage = getStorage(fbApp);
 const storageRef = ref(storage)

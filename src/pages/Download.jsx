@@ -1,11 +1,10 @@
-//@ts-check
 import { Alert, AppShell, Box, Button, Center, Footer, Header, Loader, Skeleton, Stack } from '@mantine/core';
 import { getMetadata, getStorage, ref } from "firebase/storage";
 import prettyBytes from 'pretty-bytes';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDownloadURL } from "react-firebase-hooks/storage";
 import { useParams } from "react-router-dom";
-import { fbApp } from './db';
+import { fbApp } from '@/db';
 
 const storage = getStorage(fbApp);
 
