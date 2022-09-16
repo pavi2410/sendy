@@ -1,4 +1,4 @@
-import { AppShell, Button, Center, Modal, Stack, Text, TextInput, Title, ThemeIcon, Space } from '@mantine/core';
+import { Anchor, AppShell, Button, Center, Modal, Stack, Text, TextInput, Title, ThemeIcon, Space } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
 import { useClipboard, useId } from '@mantine/hooks';
 import { getStorage, ref } from 'firebase/storage';
@@ -88,6 +88,9 @@ function Receive({ id }) {
       <TextInput label="Download Link" value={url} readOnly rightSection={copyButton} />
       <Center>
         <QRCode value={url} />
+      </Center>
+      <Center>
+        <Text color="dimmed"><Anchor onClick={() => window.location.reload()}>Refresh</Anchor> this page to upload a new file.</Text>
       </Center>
     </Stack>
   )
