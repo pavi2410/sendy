@@ -18,30 +18,25 @@ export default function Upload() {
   const id = useMemo(() => randomWords({ exactly: 3, join: '-' }), [])
   useEffect(() => console.log(id), [id])
 
-  const [opened, setOpened] = useState(false)
+  const [uploaded, setUploaded] = useState(false)
 
   return (
     <AppShell fixed padding={10}
       header={<Header />}
       footer={<Footer />}
     >
-      <Send id={id} setOpened={setOpened} />
-      <Modal
-        withCloseButton={false}
-        overlayOpacity={0.5}
-        overlayBlur={3}
-        transition="slide-up"
-        transitionDuration={300}
-        transitionTimingFunction="ease"
-        opened={opened}
-        onClose={() => setOpened(false)}>
-        <Receive id={id} />
-      </Modal>
+      <Center py="2rem">
+        {
+          uploaded
+            ? <Receive id={id} />
+            : <Send id={id} setUploaded={setUploaded} />
+        }
+      </Center>
     </AppShell>
   )
 }
 
-function Send({ id, setOpened }) {
+function Send({ id, setUploaded }) {
   const [uploadFile, uploading, snapshot, error] = useUploadFile();
 
   async function onDrop(files) {
@@ -56,30 +51,28 @@ function Send({ id, setOpened }) {
         }
       }
     );
-    setOpened(true)
+    setUploaded(true)
   }
 
   return (
-    <Center sx={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
-      <Dropzone
-        maxFiles={1}
-        maxSize={50 * 1024 * 1024}
-        padding="xl"
-        onDrop={onDrop}
-        loading={uploading}
-      >
-        <Stack align="center" justify="center" spacing="lg" style={{ minHeight: 220, pointerEvents: 'none' }}>
-          {import.meta.env.DEV && <Text>{id}</Text>}
-          <IconUpload size={48} />
-          <Text size="xl" inline>
-            Drop a file here or click to select file
-          </Text>
-          <Text size="sm" color="dimmed" inline mt={7}>
-            File size should not exceed 50MB
-          </Text>
-        </Stack>
-      </Dropzone>
-    </Center>
+    <Dropzone
+      maxFiles={1}
+      maxSize={50 * 1024 * 1024}
+      padding="xl"
+      onDrop={onDrop}
+      loading={uploading}
+    >
+      <Stack align="center" justify="center" spacing="lg" style={{ minHeight: 220, pointerEvents: 'none' }}>
+        {import.meta.env.DEV && <Text>{id}</Text>}
+        <IconUpload size={48} />
+        <Text size="xl" inline>
+          Drop a file here or click to select file
+        </Text>
+        <Text size="sm" color="dimmed" inline mt={7}>
+          File size should not exceed 50MB
+        </Text>
+      </Stack>
+    </Dropzone>
   )
 }
 
