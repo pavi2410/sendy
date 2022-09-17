@@ -69,6 +69,7 @@ function Send({ id, setOpened }) {
         loading={uploading}
       >
         <Stack align="center" justify="center" spacing="lg" style={{ minHeight: 220, pointerEvents: 'none' }}>
+          {import.meta.env.DEV && <Text>{id}</Text>}
           <IconUpload size={48} />
           <Text size="xl" inline>
             Drop a file here or click to select file

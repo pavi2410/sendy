@@ -30,6 +30,7 @@ function Content() {
 
   useEffect(() => {
     getMetadata(fileRef).then(metadata => {
+      if (import.meta.env.DEV) console.log(metadata)
       setMeta(metadata)
     })
   }, [fileRef])
