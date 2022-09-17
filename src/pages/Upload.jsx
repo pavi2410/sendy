@@ -46,7 +46,16 @@ function Send({ id, setOpened }) {
 
   async function onDrop(files) {
     const file = files[0];
-    const result = await uploadFile(ref(storageRef, id), file, { customMetadata: { realFileName: file.name } });
+    const result = await uploadFile(
+      ref(storageRef, id),
+      file,
+      {
+        contentDisposition: `attachment; filename="${file.name}"`,
+        customMetadata: {
+          realFileName: file.name
+        }
+      }
+    );
     setOpened(true)
   }
 

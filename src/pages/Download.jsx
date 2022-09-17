@@ -49,7 +49,7 @@ export default function Download() {
       <Center sx={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
         <Box style={{ backgroundColor: "#f8fafc", borderRadius: '.5rem' }} p="xl">
           <FileInfo meta={meta} />
-          <Button color="dark" radius="md" size="md" fullWidth style={{ marginTop: '1rem' }} component="a" href={value} download={meta?.customMetadata.realFileName ?? ''}>
+          <Button color="dark" radius="md" size="md" fullWidth style={{ marginTop: '1rem' }} component="a" href={value}>
             Download
           </Button>
         </Box>
