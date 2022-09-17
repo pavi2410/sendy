@@ -11,12 +11,20 @@ import { Header } from '@/components/Header';
 const storage = getStorage(fbApp);
 
 export default function Download() {
+  return (
+    <AppShell
+      header={<Header />}
+      footer={<Footer />}
+    >
+      <Content />
+    </AppShell>
+  )
+}
+
+function Content() {
   const { id } = useParams()
-
   const fileRef = useMemo(() => ref(storage, id), [id])
-
   const [value, loading, error] = useDownloadURL(fileRef);
-
   const [meta, setMeta] = useState(null)
 
   useEffect(() => {
@@ -44,19 +52,14 @@ export default function Download() {
   }
 
   return (
-    <AppShell
-      header={<Header />}
-      footer={<Footer />}
-    >
-      <Center sx={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
-        <Box style={{ backgroundColor: "#f8fafc", borderRadius: '.5rem' }} p="xl">
-          <FileInfo meta={meta} />
-          <Button color="dark" radius="md" size="md" fullWidth style={{ marginTop: '1rem' }} component="a" href={value}>
-            Download
-          </Button>
-        </Box>
-      </Center>
-    </AppShell>
+    <Center sx={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
+      <Card shadow="sm" radius="md" p="lg" withBorder>
+        <FileInfo meta={meta} />
+        <Button color="dark" radius="md" size="md" fullWidth style={{ marginTop: '1rem' }} component="a" href={value}>
+          Download
+        </Button>
+      </Card>
+    </Center>
   )
 }
 
