@@ -1,20 +1,21 @@
-import { Anchor, AppShell, Button, Center, Modal, Stack, Text, TextInput, Title, ThemeIcon, Space } from '@mantine/core';
+import { Anchor, AppShell, Button, Center, Modal, Stack, Text, TextInput, Title, ThemeIcon } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
-import { useClipboard, useId } from '@mantine/hooks';
+import { useClipboard } from '@mantine/hooks';
 import { getStorage, ref } from 'firebase/storage';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useUploadFile } from 'react-firebase-hooks/storage';
 import QRCode from 'react-qr-code';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
 import { fbApp } from '@/db';
 import { IconUpload, IconCheck } from '@tabler/icons';
+import randomWords from 'random-words';
 
 const storage = getStorage(fbApp);
 const storageRef = ref(storage)
 
 export default function Upload() {
-  const id = useId(randomHex())
+  const id = useMemo(() => randomWords({ exactly: 3, join: '-' }), [])
   useEffect(() => console.log(id), [id])
 
   const [opened, setOpened] = useState(false)
@@ -94,8 +95,4 @@ function Receive({ id }) {
       </Center>
     </Stack>
   )
-}
-
-function randomHex() {
-  return Math.random().toString(16).substring(2, 10)
 }
