@@ -1,4 +1,4 @@
-import { Alert, AppShell, Button, Card, Center, Loader, Skeleton, Stack } from '@mantine/core';
+import { Alert, AppShell, Button, Card, Center, Loader, Stack } from '@mantine/core';
 import { getMetadata, getStorage, ref } from "firebase/storage";
 import prettyBytes from 'pretty-bytes';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -25,7 +25,7 @@ export default function Download() {
 function Content() {
   const { id } = useParams()
   const fileRef = useMemo(() => ref(storage, id), [id])
-  const [value, loading, error] = useDownloadURL(fileRef);
+  const [downloadUrl, loading, error] = useDownloadURL(fileRef);
   const [meta, setMeta] = useState(null)
 
   useEffect(() => {
@@ -33,14 +33,6 @@ function Content() {
       setMeta(metadata)
     })
   }, [fileRef])
-
-  if (loading) {
-    return (
-      <Center style={{ height: '100%' }}>
-        <Loader size="xl" variant="dots" />
-      </Center>
-    )
-  }
 
   if (error) {
     return (
@@ -52,36 +44,27 @@ function Content() {
     )
   }
 
-  return (
-    <Center sx={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
-      <Card shadow="sm" radius="md" p="lg" withBorder>
-        <FileInfo meta={meta} />
-        <Button color="dark" radius="md" size="md" fullWidth style={{ marginTop: '1rem' }} component="a" href={value}>
-          Download
-        </Button>
-      </Card>
-    </Center>
-  )
-}
-
-function FileInfo({ meta }) {
-  if (!meta) {
+  if (loading || !meta) {
     return (
-      <Stack spacing="lg">
-        <Skeleton width="30ch" height="1rem" radius="xl" />
-        <Skeleton width="30ch" height="1rem" radius="xl" />
-        <Skeleton width="30ch" height="1rem" radius="xl" />
-        <Skeleton width="30ch" height="1rem" radius="xl" />
-      </Stack>
+      <Center style={{ height: '100%' }}>
+        <Loader size="xl" variant="dots" />
+      </Center>
     )
   }
 
   return (
-    <Stack spacing="lg">
-      <div>Name <b>{meta.customMetadata.realFileName}</b></div>
-      <div>Size <b>{prettyBytes(meta.size)}</b></div>
-      <div>Type <b>{meta.contentType}</b></div>
-      <div>Uploaded <b>{new Date(meta.timeCreated).toLocaleString()}</b></div>
-    </Stack>
+    <Center sx={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
+      <Card shadow="sm" radius="md" p="lg" withBorder>
+        <Stack spacing="lg">
+          <div>Name <b>{meta.customMetadata.realFileName}</b></div>
+          <div>Size <b>{prettyBytes(meta.size)}</b></div>
+          <div>Type <b>{meta.contentType}</b></div>
+          <div>Uploaded <b>{new Date(meta.timeCreated).toLocaleString()}</b></div>
+        </Stack>
+        <Button color="dark" radius="md" size="md" fullWidth style={{ marginTop: '1rem' }} component="a" href={downloadUrl}>
+          Download
+        </Button>
+      </Card>
+    </Center>
   )
 }
