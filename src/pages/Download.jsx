@@ -1,10 +1,12 @@
-import { Alert, AppShell, Box, Button, Center, Footer, Header, Loader, Skeleton, Stack } from '@mantine/core';
+import { Alert, AppShell, Button, Card, Center, Loader, Skeleton, Stack } from '@mantine/core';
 import { getMetadata, getStorage, ref } from "firebase/storage";
 import prettyBytes from 'pretty-bytes';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useDownloadURL } from "react-firebase-hooks/storage";
 import { useParams } from "react-router-dom";
 import { fbApp } from '@/db';
+import { Footer } from '@/components/Footer';
+import { Header } from '@/components/Header';
 
 const storage = getStorage(fbApp);
 
