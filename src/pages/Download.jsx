@@ -35,7 +35,7 @@ function Content() {
 
   if (loading) {
     return (
-      <Center sx={{ height: '100vh' }}>
+      <Center style={{ height: '100%' }}>
         <Loader size="xl" variant="dots" />
       </Center>
     )
@@ -43,7 +43,7 @@ function Content() {
 
   if (error) {
     return (
-      <Center sx={{ height: '100vh' }}>
+      <Center style={{ height: '100%' }}>
         <Alert title="Invalid Code" color="red" radius="md">
           The code is invalid... Make sure you have the correct link.
         </Alert>
