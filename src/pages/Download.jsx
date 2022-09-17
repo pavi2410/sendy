@@ -7,6 +7,7 @@ import { useParams } from "react-router-dom";
 import { fbApp } from '@/db';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { IconAlertTriangle } from '@tabler/icons';
 
 const storage = getStorage(fbApp);
 
@@ -44,7 +45,7 @@ function Content() {
   if (error) {
     return (
       <Center style={{ height: '100%' }}>
-        <Alert title="Invalid Code" color="red" radius="md">
+        <Alert title="File doesn't exist" color="red" radius="md" icon={<IconAlertTriangle size={32} />}>
           The code is invalid... Make sure you have the correct link.
         </Alert>
       </Center>
