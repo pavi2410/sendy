@@ -1,17 +1,10 @@
-import { Avatar, Group, Header as MantineHeader, Title } from '@mantine/core'
-import { ColorSchemeToggle } from '@/components/ColorSchemeToggle'
+import { Avatar, Group, Title } from '@mantine/core'
 
 export function Header() {
   return (
-    <MantineHeader height={60}>
-      <Group position="apart" align="center" py={8}>
-        <div />
-        <Group>
-          <Avatar src="/icon-192.png" alt="logo" />
-          <Title>sendy</Title>
-        </Group>
-        <ColorSchemeToggle />
-      </Group>
-    </MantineHeader>
+    <Group justify="center" align="center" h="100%">
+      <Avatar src="/icon-192.png" alt="logo" />
+      <Title order={2}>sendy</Title>
+    </Group>
   )
 }

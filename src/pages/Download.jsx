@@ -1,4 +1,4 @@
-import { Alert, AppShell, Button, Card, Center, Loader, Stack } from '@mantine/core';
+import { Container, Text, Alert, AppShell, Button, Card, Center, Loader, Stack } from '@mantine/core';
 import { getMetadata, getStorage, ref } from "firebase/storage";
 import prettyBytes from 'pretty-bytes';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -7,17 +7,24 @@ import { useParams } from "react-router-dom";
 import { fbApp } from '@/db';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
-import { IconAlertTriangle } from '@tabler/icons';
+import { IconAlertTriangle } from '@tabler/icons-react';
 
 const storage = getStorage(fbApp);
 
 export default function Download() {
   return (
-    <AppShell
-      header={<Header />}
-      footer={<Footer />}
-    >
-      <Content />
+    <AppShell header={{ height: 60 }} padding="md">
+      <AppShell.Header>
+        <Header />
+      </AppShell.Header>
+
+      <AppShell.Footer>
+        <Footer />
+      </AppShell.Footer>
+
+      <AppShell.Main>
+        <Content />
+      </AppShell.Main>
     </AppShell>
   )
 }
@@ -48,24 +55,24 @@ function Content() {
   if (loading || !meta) {
     return (
       <Center style={{ height: '100%' }}>
-        <Loader size="xl" variant="dots" />
+        <Loader variant="dots" />
       </Center>
     )
   }
 
   return (
-    <Center sx={{ paddingTop: '2rem', paddingBottom: '2rem' }}>
+    <Container size='xs'>
       <Card shadow="sm" radius="md" p="lg" withBorder>
-        <Stack spacing="lg">
-          <div>Name <b>{meta.customMetadata.realFileName}</b></div>
-          <div>Size <b>{prettyBytes(meta.size)}</b></div>
-          <div>Type <b>{meta.contentType}</b></div>
-          <div>Uploaded <b>{new Date(meta.timeCreated).toLocaleString()}</b></div>
+        <Stack>
+          <Text>Name <Text fw={700} size='lg'>{meta.customMetadata.realFileName}</Text></Text>
+          <Text>Size <Text fw={700} size='lg'>{prettyBytes(meta.size)}</Text></Text>
+          <Text>Type <Text fw={700} size='lg'>{meta.contentType}</Text></Text>
+          <Text>Uploaded <Text fw={700} size='lg'>{new Date(meta.timeCreated).toLocaleString()}</Text></Text>
         </Stack>
-        <Button color="dark" radius="md" size="md" fullWidth style={{ marginTop: '1rem' }} component="a" href={downloadUrl}>
+        <Button color="dark" radius="md" size="md" fullWidth mt="md" component="a" href={downloadUrl}>
           Download
         </Button>
       </Card>
-    </Center>
+    </Container>
   )
 }
