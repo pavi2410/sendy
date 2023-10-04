@@ -33,7 +33,7 @@ export default function Upload() {
       <AppShell.Main>
         <Container size='xs'>
           {
-            !uploaded
+            uploaded
               ? <Receive id={id} />
               : <Send id={id} setUploaded={setUploaded} />
           }
