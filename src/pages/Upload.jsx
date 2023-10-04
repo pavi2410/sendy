@@ -110,7 +110,9 @@ function Receive({ id }) {
       <TextInput label="Download Link" value={url} readOnly rightSection={copyButton} />
 
       <Center>
-        <QRCode value={url} />
+        <div style={{ background: 'white', padding: '16px' }}>
+          <QRCode value={url} />
+        </div>
       </Center>
 
       <Center>
