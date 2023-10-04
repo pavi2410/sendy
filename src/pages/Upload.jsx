@@ -1,6 +1,6 @@
 import { Group, ActionIcon, Anchor, AppShell, Center, Stack, Text, TextInput, Title, ThemeIcon, Container } from '@mantine/core';
 import { Dropzone } from '@mantine/dropzone';
-import { useClipboard } from '@mantine/hooks';
+import { useClipboard, useWindowEvent } from '@mantine/hooks';
 import { getStorage, ref } from 'firebase/storage';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useUploadFile } from 'react-firebase-hooks/storage';
@@ -61,6 +61,12 @@ function Send({ id, setUploaded }) {
     setUploaded(true)
   }
 
+  useWindowEvent('paste', (event) => {
+    if (event.clipboardData.files.length) {
+      onDrop(event.clipboardData.files)
+    }
+  })
+
   return (
     <Dropzone
       maxFiles={1}
@@ -72,10 +78,10 @@ function Send({ id, setUploaded }) {
       <Stack align="center" justify="center" spacing="lg" mih={220} style={{ pointerEvents: 'none' }}>
         {import.meta.env.DEV && <Text>{id}</Text>}
         <IconUpload size={48} />
-        <Text size="xl" inline>
+        <Text size="xl">
           Drop a file here or click to select file
         </Text>
-        <Text size="sm" color="dimmed" inline mt={7}>
+        <Text size="sm" c="dimmed">
           File size should not exceed 50MB
         </Text>
       </Stack>
