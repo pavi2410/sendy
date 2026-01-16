@@ -4,7 +4,7 @@ import { getUploadUrl, getDownloadUrl } from "@sendy/storage";
 import { eq } from "drizzle-orm";
 
 export const getPresignedUploadUrl = createServerFn({ method: "POST" })
-  .validator(
+  .inputValidator(
     (data: {
       id: string;
       fileName: string;
@@ -40,7 +40,7 @@ export const getPresignedUploadUrl = createServerFn({ method: "POST" })
   });
 
 export const getFileMetadata = createServerFn({ method: "GET" })
-  .validator((id: string) => id)
+  .inputValidator((id: string) => id)
   .handler(async ({ data: id }) => {
     const file = await db.query.files.findFirst({
       where: eq(files.id, id),
@@ -58,7 +58,7 @@ export const getFileMetadata = createServerFn({ method: "GET" })
   });
 
 export const getPresignedDownloadUrl = createServerFn({ method: "GET" })
-  .validator((id: string) => id)
+  .inputValidator((id: string) => id)
   .handler(async ({ data: id }) => {
     const file = await db.query.files.findFirst({
       where: eq(files.id, id),
