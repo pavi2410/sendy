@@ -4,7 +4,6 @@
   "workspaces": ["apps/*", "packages/*"],
   "scripts": {
     "dev": "bun run --filter @sendy/web dev",
-    "build": "bun run --filter '*' build",
     "db:generate": "bun run --filter @sendy/db generate",
     "db:migrate": "bun run --filter @sendy/db migrate",
     "db:push": "bun run --filter @sendy/db push"
