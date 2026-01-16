@@ -17,7 +17,7 @@ const s3Client = new S3Client({
   forcePathStyle: true,
 });
 
-const BUCKET_NAME = process.env.S3_BUCKET_NAME!;
+const BUCKET_NAME = process.env.S3_BUCKET!;
 
 export interface UploadUrlOptions {
   key: string;
