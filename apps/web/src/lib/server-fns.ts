@@ -17,10 +17,9 @@ export const getPresignedUploadUrl = createServerFn({ method: "POST" })
     const { id, fileName, contentType, size, expirationDays } = data;
     const s3Key = `files/${id}`;
 
-    const uploadUrl = await getUploadUrl({
+    const uploadUrl = getUploadUrl({
       key: s3Key,
       contentType,
-      contentLength: size,
       expiresIn: 3600,
     });
 
@@ -73,9 +72,8 @@ export const getPresignedDownloadUrl = createServerFn({ method: "GET" })
       return { error: "File has expired" };
     }
 
-    const downloadUrl = await getDownloadUrl({
+    const downloadUrl = getDownloadUrl({
       key: file.s3Key,
-      filename: file.originalName,
       expiresIn: 3600,
     });
 

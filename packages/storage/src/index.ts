@@ -1,99 +1,64 @@
-import {
-  S3Client,
-  PutObjectCommand,
-  GetObjectCommand,
-  DeleteObjectCommand,
-  HeadObjectCommand,
-} from "@aws-sdk/client-s3";
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
+import { S3Client } from "bun";
 
-const s3Client = new S3Client({
+const s3 = new S3Client({
   endpoint: process.env.S3_ENDPOINT,
   region: process.env.S3_REGION || "auto",
-  credentials: {
-    accessKeyId: process.env.S3_ACCESS_KEY_ID!,
-    secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
-  },
-  forcePathStyle: true,
+  accessKeyId: process.env.S3_ACCESS_KEY_ID!,
+  secretAccessKey: process.env.S3_SECRET_ACCESS_KEY!,
+  bucket: process.env.S3_BUCKET!,
 });
-
-const BUCKET_NAME = process.env.S3_BUCKET!;
 
 export interface UploadUrlOptions {
   key: string;
   contentType: string;
-  contentLength: number;
   expiresIn?: number;
 }
 
 export interface DownloadUrlOptions {
   key: string;
-  filename: string;
   expiresIn?: number;
 }
 
 /**
  * Generate a presigned URL for uploading a file directly to S3
  */
-export async function getUploadUrl({
+export function getUploadUrl({
   key,
   contentType,
-  contentLength,
   expiresIn = 3600,
-}: UploadUrlOptions): Promise<string> {
-  const command = new PutObjectCommand({
-    Bucket: BUCKET_NAME,
-    Key: key,
-    ContentType: contentType,
-    ContentLength: contentLength,
+}: UploadUrlOptions): string {
+  return s3.presign(key, {
+    method: "PUT",
+    type: contentType,
+    expiresIn,
   });
-
-  return getSignedUrl(s3Client, command, { expiresIn });
 }
 
 /**
  * Generate a presigned URL for downloading a file from S3
  */
-export async function getDownloadUrl({
+export function getDownloadUrl({
   key,
-  filename,
   expiresIn = 3600,
-}: DownloadUrlOptions): Promise<string> {
-  const command = new GetObjectCommand({
-    Bucket: BUCKET_NAME,
-    Key: key,
-    ResponseContentDisposition: `attachment; filename="${filename}"`,
+}: DownloadUrlOptions): string {
+  return s3.presign(key, {
+    method: "GET",
+    expiresIn,
   });
-
-  return getSignedUrl(s3Client, command, { expiresIn });
 }
 
 /**
  * Delete a file from S3
  */
 export async function deleteFile(key: string): Promise<void> {
-  const command = new DeleteObjectCommand({
-    Bucket: BUCKET_NAME,
-    Key: key,
-  });
-
-  await s3Client.send(command);
+  await s3.delete(key);
 }
 
 /**
  * Check if a file exists in S3
  */
 export async function fileExists(key: string): Promise<boolean> {
-  try {
-    const command = new HeadObjectCommand({
-      Bucket: BUCKET_NAME,
-      Key: key,
-    });
-    await s3Client.send(command);
-    return true;
-  } catch {
-    return false;
-  }
+  return s3.exists(key);
 }
 
-export { s3Client, BUCKET_NAME };
+export { s3 };
