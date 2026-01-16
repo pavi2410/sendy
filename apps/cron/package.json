@@ -1,0 +1,17 @@
+{
+  "name": "@sendy/cron",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "gc": "bun run src/gc.ts"
+  },
+  "dependencies": {
+    "@sendy/db": "workspace:*",
+    "@sendy/storage": "workspace:*",
+    "drizzle-orm": "^0.38.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  }
+}
