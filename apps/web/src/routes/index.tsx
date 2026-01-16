@@ -15,20 +15,20 @@ export const Route = createFileRoute("/")({ component: UploadPage });
 
 function UploadPage() {
   const id = useMemo(() => generate({ exactly: 3, join: "-" }), []);
-  const [uploaded, setUploaded] = useState(false);
+  const [uploadResult, setUploadResult] = useState<{ shortCode: string } | null>(null);
 
   return (
     <div className="container mx-auto max-w-md py-12 px-4">
-      {uploaded ? (
-        <UploadSuccess id={id} />
+      {uploadResult ? (
+        <UploadSuccess id={id} shortCode={uploadResult.shortCode} />
       ) : (
-        <UploadForm id={id} onSuccess={() => setUploaded(true)} />
+        <UploadForm id={id} onSuccess={(result) => setUploadResult(result)} />
       )}
     </div>
   );
 }
 
-function UploadForm({ id, onSuccess }: { id: string; onSuccess: () => void }) {
+function UploadForm({ id, onSuccess }: { id: string; onSuccess: (result: { shortCode: string }) => void }) {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [expirationDays, setExpirationDays] = useState(DEFAULT_EXPIRATION_DAYS);
@@ -43,7 +43,7 @@ function UploadForm({ id, onSuccess }: { id: string; onSuccess: () => void }) {
       setUploading(true);
 
       try {
-        const { uploadUrl } = await getPresignedUploadUrl({
+        const { uploadUrl, shortCode } = await getPresignedUploadUrl({
           data: {
             id,
             fileName: file.name,
@@ -61,7 +61,7 @@ function UploadForm({ id, onSuccess }: { id: string; onSuccess: () => void }) {
           },
         });
 
-        onSuccess();
+        onSuccess({ shortCode });
       } catch (error) {
         console.error("Upload failed:", error);
         alert("Upload failed. Please try again.");
@@ -150,14 +150,23 @@ function UploadForm({ id, onSuccess }: { id: string; onSuccess: () => void }) {
   );
 }
 
-function UploadSuccess({ id }: { id: string }) {
-  const url = typeof window !== "undefined" ? `${window.location.origin}/${id}` : `/${id}`;
-  const [copied, setCopied] = useState(false);
+function UploadSuccess({ id, shortCode }: { id: string; shortCode: string }) {
+  const baseUrl = typeof window !== "undefined" ? window.location.origin : "";
+  const wordUrl = `${baseUrl}/dl/${id}`;
+  const codeUrl = `${baseUrl}/dl/${shortCode}`;
+  const [copiedWord, setCopiedWord] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
 
-  const copyToClipboard = async () => {
-    await navigator.clipboard.writeText(url);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const copyWordUrl = async () => {
+    await navigator.clipboard.writeText(wordUrl);
+    setCopiedWord(true);
+    setTimeout(() => setCopiedWord(false), 2000);
+  };
+
+  const copyCodeUrl = async () => {
+    await navigator.clipboard.writeText(codeUrl);
+    setCopiedCode(true);
+    setTimeout(() => setCopiedCode(false), 2000);
   };
 
   return (
@@ -172,11 +181,11 @@ function UploadSuccess({ id }: { id: string }) {
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
-          <Label>Download Link</Label>
+          <Label>Word Link</Label>
           <div className="flex gap-2">
-            <Input value={url} readOnly />
-            <Button variant="outline" size="icon" onClick={copyToClipboard}>
-              {copied ? (
+            <Input value={wordUrl} readOnly />
+            <Button variant="outline" size="icon" onClick={copyWordUrl}>
+              {copiedWord ? (
                 <Check className="h-4 w-4" />
               ) : (
                 <Copy className="h-4 w-4" />
@@ -185,9 +194,24 @@ function UploadSuccess({ id }: { id: string }) {
           </div>
         </div>
 
+        <div className="space-y-2">
+          <Label>Short Code</Label>
+          <div className="flex gap-2">
+            <Input value={codeUrl} readOnly />
+            <Button variant="outline" size="icon" onClick={copyCodeUrl}>
+              {copiedCode ? (
+                <Check className="h-4 w-4" />
+              ) : (
+                <Copy className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+          <p className="text-xs text-muted-foreground">6-digit code: {shortCode}</p>
+        </div>
+
         <div className="flex justify-center">
           <div className="rounded-lg bg-white p-4">
-            <QRCode value={url} size={200} />
+            <QRCode value={wordUrl} size={200} />
           </div>
         </div>
 

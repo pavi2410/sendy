@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getFileMetadata, getPresignedDownloadUrl } from "@/lib/server-fns";
 
-export const Route = createFileRoute("/$id")({
+export const Route = createFileRoute("/dl/$id")({
   component: DownloadPage,
   loader: async ({ params }) => {
     const result = await getFileMetadata({ data: params.id });

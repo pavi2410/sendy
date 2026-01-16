@@ -1,7 +1,22 @@
 import { createServerFn } from "@tanstack/react-start";
 import { db, files, DEFAULT_EXPIRATION_DAYS } from "@sendy/db";
 import { getUploadUrl, getDownloadUrl } from "@sendy/storage";
-import { eq } from "drizzle-orm";
+import { eq, or, and, isNotNull } from "drizzle-orm";
+
+const SHORT_CODE_PATTERN = /^[A-Z0-9]{6}$/;
+
+function isValidShortCode(code: string): boolean {
+  return SHORT_CODE_PATTERN.test(code.toUpperCase());
+}
+
+function generateShortCode(): string {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let code = "";
+  for (let i = 0; i < 6; i++) {
+    code += chars[Math.floor(Math.random() * chars.length)];
+  }
+  return code;
+}
 
 export const getPresignedUploadUrl = createServerFn({ method: "POST" })
   .inputValidator(
@@ -27,8 +42,11 @@ export const getPresignedUploadUrl = createServerFn({ method: "POST" })
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + expDays);
 
+    const shortCode = generateShortCode();
+
     await db.insert(files).values({
       id,
+      shortCode,
       originalName: fileName,
       contentType,
       size,
@@ -36,14 +54,27 @@ export const getPresignedUploadUrl = createServerFn({ method: "POST" })
       expiresAt,
     });
 
-    return { uploadUrl };
+    return { uploadUrl, shortCode };
   });
 
 export const getFileMetadata = createServerFn({ method: "GET" })
   .inputValidator((id: string) => id)
   .handler(async ({ data: id }) => {
+    if (!id || !id.trim()) {
+      return { error: "Invalid file ID" };
+    }
+
+    const trimmedId = id.trim();
+    const upperCaseId = trimmedId.toUpperCase();
+
+    // Only include shortCode lookup if it matches the pattern (prevents matching empty/null)
     const file = await db.query.files.findFirst({
-      where: eq(files.id, id),
+      where: isValidShortCode(trimmedId)
+        ? or(
+            eq(files.id, trimmedId),
+            and(isNotNull(files.shortCode), eq(files.shortCode, upperCaseId))
+          )
+        : eq(files.id, trimmedId),
     });
 
     if (!file) {
@@ -60,8 +91,21 @@ export const getFileMetadata = createServerFn({ method: "GET" })
 export const getPresignedDownloadUrl = createServerFn({ method: "GET" })
   .inputValidator((id: string) => id)
   .handler(async ({ data: id }) => {
+    if (!id || !id.trim()) {
+      return { error: "Invalid file ID" };
+    }
+
+    const trimmedId = id.trim();
+    const upperCaseId = trimmedId.toUpperCase();
+
+    // Only include shortCode lookup if it matches the pattern (prevents matching empty/null)
     const file = await db.query.files.findFirst({
-      where: eq(files.id, id),
+      where: isValidShortCode(trimmedId)
+        ? or(
+            eq(files.id, trimmedId),
+            and(isNotNull(files.shortCode), eq(files.shortCode, upperCaseId))
+          )
+        : eq(files.id, trimmedId),
     });
 
     if (!file) {

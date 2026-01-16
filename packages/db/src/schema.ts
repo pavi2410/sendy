@@ -2,6 +2,7 @@ import { pgTable, text, timestamp, integer } from "drizzle-orm/pg-core";
 
 export const files = pgTable("files", {
   id: text("id").primaryKey(),
+  shortCode: text("short_code").unique(),
   originalName: text("original_name").notNull(),
   contentType: text("content_type").notNull(),
   size: integer("size").notNull(),

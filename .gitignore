@@ -30,5 +30,5 @@ package-lock.json
 yarn.lock
 pnpm-lock.yaml
 
-# Drizzle
-drizzle/
+# Drizzle - track migrations
+# drizzle/
