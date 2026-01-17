@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useMemo, useCallback } from "react";
 import { generate } from "random-words";
-import { Copy, Check, Upload, Spinner } from "@phosphor-icons/react";
+import { Copy, Check, Upload, Spinner, MagnifyingGlass } from "@phosphor-icons/react";
 import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Field, FieldLabel } from "@/components/ui/field";
 import { getPresignedUploadUrl } from "@/lib/server-fns";
+import { useNavigate } from "@tanstack/react-router";
 import { MAX_FILE_SIZE_MB, MAX_FILE_SIZE_BYTES, DEFAULT_EXPIRATION_DAYS } from "@sendy/db/config";
 
 export const Route = createFileRoute("/")({ component: UploadPage });
@@ -18,13 +19,50 @@ function UploadPage() {
   const [uploadResult, setUploadResult] = useState<{ shortCode: string } | null>(null);
 
   return (
-    <div className="container mx-auto max-w-md py-12 px-4">
+    <div className="container mx-auto max-w-md py-12 px-4 space-y-6">
+      <FileLookup />
       {uploadResult ? (
         <UploadSuccess id={id} shortCode={uploadResult.shortCode} />
       ) : (
         <UploadForm id={id} onSuccess={(result) => setUploadResult(result)} />
       )}
     </div>
+  );
+}
+
+function FileLookup() {
+  const [code, setCode] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = code.trim();
+    if (trimmed) {
+      navigate({ to: "/dl/$id", params: { id: trimmed } });
+    }
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Retrieve a file</CardTitle>
+        <CardDescription>
+          Enter the 3-word code or 6-digit shortcode
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="flex gap-2">
+          <Input
+            placeholder="e.g. apple-banana-cherry or ABC123"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+          />
+          <Button type="submit" disabled={!code.trim()}>
+            <MagnifyingGlass className="h-4 w-4" />
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
 
@@ -142,7 +180,7 @@ function UploadForm({ id, onSuccess }: { id: string; onSuccess: (result: { short
             onChange={(e) => setExpirationDays(Number(e.target.value))}
           />
           <p className="text-xs text-muted-foreground">
-            Default: {DEFAULT_EXPIRATION_DAYS} days (1 year)
+            Default: {DEFAULT_EXPIRATION_DAYS} days. Max: 365 days.
           </p>
         </Field>
       </CardContent>

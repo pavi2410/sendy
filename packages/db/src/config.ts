@@ -1,5 +1,5 @@
-/** Default file expiration in days (1 year) */
-export const DEFAULT_EXPIRATION_DAYS = 365;
+/** Default file expiration in days (1 week) */
+export const DEFAULT_EXPIRATION_DAYS = 7;
 
 /** Maximum file size in MB */
 export const MAX_FILE_SIZE_MB = 50;

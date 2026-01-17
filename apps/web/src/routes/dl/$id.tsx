@@ -51,6 +51,7 @@ function ErrorState({ message }: { message: string }) {
 interface FileDetailsProps {
   file: {
     id: string;
+    shortCode: string | null;
     originalName: string;
     contentType: string;
     size: number;
@@ -89,6 +90,16 @@ function FileDetails({ file, id }: FileDetailsProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4 text-sm">
+            <div>
+              <p className="text-muted-foreground">3-Word Code</p>
+              <p className="font-medium font-mono">{file.id}</p>
+            </div>
+            {file.shortCode && (
+              <div>
+                <p className="text-muted-foreground">Shortcode</p>
+                <p className="font-medium font-mono">{file.shortCode}</p>
+              </div>
+            )}
             <div>
               <p className="text-muted-foreground">Size</p>
               <p className="font-medium">{prettyBytes(file.size)}</p>
