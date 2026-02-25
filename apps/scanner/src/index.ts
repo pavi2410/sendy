@@ -1,8 +1,8 @@
 import { Worker, type Job } from "bullmq";
 import { db, scans, files } from "@sendy/db";
 import { s3 } from "@sendy/storage";
-import { eq, desc } from "drizzle-orm";
-import { scanner } from "./scanner";
+import { eq } from "drizzle-orm";
+import { scanBytes } from "pompelmi";
 
 const REDIS_URL = process.env.REDIS_URL;
 if (!REDIS_URL) throw new Error("REDIS_URL environment variable is required");
@@ -41,7 +41,9 @@ const worker = new Worker<{ fileId: string; s3Key: string }>(
     const arrayBuffer = await s3.file(s3Key).arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
-    const result = await scanner.scan(buffer);
+    const result = await scanBytes(buffer, {
+      preset: 'balanced'
+    });
     const verdict = result.verdict as "clean" | "suspicious" | "malicious";
     const reasons = result.reasons?.length
       ? JSON.stringify(result.reasons)
