@@ -1,7 +1,8 @@
 import { createServerFn } from "@tanstack/react-start";
-import { db, files, DEFAULT_EXPIRATION_DAYS } from "@sendy/db";
+import { db, files, scans, DEFAULT_EXPIRATION_DAYS } from "@sendy/db";
 import { getUploadUrl, getDownloadUrl } from "@sendy/storage";
-import { eq, or, and, isNotNull } from "drizzle-orm";
+import { eq, or, and, isNotNull, desc } from "drizzle-orm";
+import { scanQueue } from "./queue";
 
 const SHORT_CODE_PATTERN = /^[A-Z0-9]{6}$/;
 
@@ -54,6 +55,14 @@ export const getPresignedUploadUrl = createServerFn({ method: "POST" })
       expiresAt,
     });
 
+    await db.insert(scans).values({ fileId: id, verdict: "pending" });
+
+    try {
+      await scanQueue?.add("scan", { fileId: id, s3Key }, { attempts: 3, backoff: { type: "exponential", delay: 5000 } });
+    } catch (err) {
+      console.error("[queue] Failed to enqueue scan job:", err);
+    }
+
     return { uploadUrl, shortCode };
   });
 
@@ -85,7 +94,12 @@ export const getFileMetadata = createServerFn({ method: "GET" })
       return { error: "File has expired" };
     }
 
-    return { file };
+    const latestScan = await db.query.scans.findFirst({
+      where: eq(scans.fileId, file.id),
+      orderBy: [desc(scans.id)],
+    });
+
+    return { file, latestScan: latestScan ?? null };
   });
 
 export const getPresignedDownloadUrl = createServerFn({ method: "GET" })
@@ -127,4 +141,39 @@ export const getPresignedDownloadUrl = createServerFn({ method: "GET" })
       .where(eq(files.id, id));
 
     return { downloadUrl };
+  });
+
+export const requeueScan = createServerFn({ method: "POST" })
+  .inputValidator((id: string) => id)
+  .handler(async ({ data: id }) => {
+    if (!id || !id.trim()) {
+      return { error: "Invalid file ID" };
+    }
+
+    const file = await db.query.files.findFirst({
+      where: eq(files.id, id.trim()),
+    });
+
+    if (!file) {
+      return { error: "File not found" };
+    }
+
+    if (new Date() > file.expiresAt) {
+      return { error: "File has expired" };
+    }
+
+    await db.insert(scans).values({ fileId: file.id, verdict: "pending", priority: 1 });
+
+    try {
+      await scanQueue?.add(
+        "scan",
+        { fileId: file.id, s3Key: file.s3Key },
+        { priority: 1, attempts: 3, backoff: { type: "exponential", delay: 5000 } }
+      );
+    } catch (err) {
+      console.error("[queue] Failed to requeue scan job:", err);
+      return { error: "Failed to queue scan" };
+    }
+
+    return { ok: true };
   });

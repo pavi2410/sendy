@@ -38,7 +38,8 @@
     "drizzle-orm": "catalog:",
     "random-words": "^2.0.1",
     "pretty-bytes": "^6.1.1",
-    "react-qr-code": "^2.0.15"
+    "react-qr-code": "^2.0.15",
+    "bullmq": "catalog:"
   },
   "devDependencies": {
     "@tanstack/devtools-vite": "^0.3.11",

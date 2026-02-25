@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, integer, bigint } from "drizzle-orm/pg-core";
 
 export const files = pgTable("files", {
   id: text("id").primaryKey(),
@@ -14,3 +14,15 @@ export const files = pgTable("files", {
 
 export type File = typeof files.$inferSelect;
 export type NewFile = typeof files.$inferInsert;
+
+export const scans = pgTable("scans", {
+  id: bigint("id", { mode: "number" }).generatedAlwaysAsIdentity().primaryKey(),
+  fileId: text("file_id").notNull().references(() => files.id, { onDelete: "cascade" }),
+  verdict: text("verdict").notNull().$type<"pending" | "clean" | "suspicious" | "malicious" | "failed">(),
+  reasons: text("reasons"),
+  scannedAt: timestamp("scanned_at").defaultNow().notNull(),
+  priority: integer("priority").default(0).notNull(),
+});
+
+export type Scan = typeof scans.$inferSelect;
+export type NewScan = typeof scans.$inferInsert;

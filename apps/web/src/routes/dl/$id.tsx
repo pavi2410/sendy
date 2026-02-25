@@ -1,10 +1,29 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Download, Warning, Spinner } from "@phosphor-icons/react";
+import { useState, useEffect, useCallback } from "react";
+import { Download, Warning, Spinner, Shield, ShieldWarning, ShieldSlash, ShieldCheck } from "@phosphor-icons/react";
 import prettyBytes from "pretty-bytes";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getFileMetadata, getPresignedDownloadUrl } from "@/lib/server-fns";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { getFileMetadata, getPresignedDownloadUrl, requeueScan } from "@/lib/server-fns";
+import type { Scan, File } from "@sendy/db";
+
+const STALE_THRESHOLD_MS = 30_000;
+const POLL_INTERVAL_MS = 2_000;
+const CONFIRM_PHRASE = "download anyway";
+
+type Verdict = "pending" | "clean" | "suspicious" | "malicious" | "failed";
 
 export const Route = createFileRoute("/dl/$id")({
   component: DownloadPage,
@@ -19,10 +38,10 @@ function DownloadPage() {
   const { id } = Route.useParams();
 
   if ("error" in data) {
-    return <ErrorState message={data.error} />;
+    return <ErrorState message={data.error ?? "Unknown error"} />;
   }
 
-  return <FileDetails file={data.file} id={id} />;
+  return <FileDetails file={data.file} initialScan={data.latestScan} id={id} />;
 }
 
 function ErrorState({ message }: { message: string }) {
@@ -49,23 +68,86 @@ function ErrorState({ message }: { message: string }) {
 }
 
 interface FileDetailsProps {
-  file: {
-    id: string;
-    shortCode: string | null;
-    originalName: string;
-    contentType: string;
-    size: number;
-    createdAt: Date;
-    expiresAt: Date;
-    downloadCount: number;
-  };
+  file: File;
+  initialScan: Scan | null;
   id: string;
 }
 
-function FileDetails({ file, id }: FileDetailsProps) {
-  const [downloading, setDownloading] = useState(false);
+function VerdictBadge({ verdict }: { verdict: Verdict }) {
+  if (verdict === "clean") {
+    return (
+      <Badge className="bg-green-500/10 text-green-700 dark:text-green-400 border-green-500/20 gap-1.5">
+        <ShieldCheck className="h-3 w-3" weight="fill" />
+        Verified clean
+      </Badge>
+    );
+  }
+  if (verdict === "suspicious") {
+    return (
+      <Badge className="bg-orange-500/10 text-orange-700 dark:text-orange-400 border-orange-500/20 gap-1.5">
+        <ShieldWarning className="h-3 w-3" weight="fill" />
+        Flagged as suspicious
+      </Badge>
+    );
+  }
+  if (verdict === "malicious") {
+    return (
+      <Badge variant="destructive" className="gap-1.5">
+        <ShieldSlash className="h-3 w-3" weight="fill" />
+        Malicious file
+      </Badge>
+    );
+  }
+  if (verdict === "failed") {
+    return (
+      <Badge variant="outline" className="gap-1.5 text-muted-foreground">
+        <Shield className="h-3 w-3" />
+        Scan failed
+      </Badge>
+    );
+  }
+  return (
+    <Badge className="bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/20 gap-1.5">
+      <Spinner className="h-3 w-3 animate-spin" />
+      Verification in progress
+    </Badge>
+  );
+}
 
-  const handleDownload = async () => {
+function FileDetails({ file, initialScan, id }: FileDetailsProps) {
+  const [scan, setScan] = useState<Scan | null>(initialScan);
+  const [downloading, setDownloading] = useState(false);
+  const [requeuing, setRequeuing] = useState(false);
+  const [suspiciousOpen, setSuspiciousOpen] = useState(false);
+  const [confirmInput, setConfirmInput] = useState("");
+
+  const verdict: Verdict = (scan?.verdict as Verdict) ?? "pending";
+  const isTerminal = verdict === "clean" || verdict === "suspicious" || verdict === "malicious";
+
+  const pollScan = useCallback(async () => {
+    const result = await getFileMetadata({ data: id });
+    if ("error" in result) return;
+    setScan(result.latestScan);
+  }, [id]);
+
+  useEffect(() => {
+    if (isTerminal) return;
+    const interval = setInterval(pollScan, POLL_INTERVAL_MS);
+    return () => clearInterval(interval);
+  }, [isTerminal, pollScan]);
+
+  useEffect(() => {
+    if (verdict !== "pending" && verdict !== "failed") return;
+    if (!scan) return;
+    const age = Date.now() - new Date(scan.scannedAt).getTime();
+    if (age < STALE_THRESHOLD_MS) return;
+    if (requeuing) return;
+
+    setRequeuing(true);
+    requeueScan({ data: id }).finally(() => setRequeuing(false));
+  }, [verdict, scan, id, requeuing]);
+
+  const doDownload = async () => {
     setDownloading(true);
     try {
       const result = await getPresignedDownloadUrl({ data: id });
@@ -82,11 +164,24 @@ function FileDetails({ file, id }: FileDetailsProps) {
     }
   };
 
+  const handleDownloadClick = () => {
+    if (verdict === "suspicious") {
+      setSuspiciousOpen(true);
+    } else {
+      doDownload();
+    }
+  };
+
+  const reasons: string[] = scan?.reasons ? JSON.parse(scan.reasons) : [];
+
   return (
     <div className="container mx-auto max-w-md py-12 px-4">
       <Card>
         <CardHeader>
           <CardTitle className="break-all">{file.originalName}</CardTitle>
+          <div className="pt-1">
+            <VerdictBadge verdict={verdict} />
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-2 gap-4 text-sm">
@@ -122,26 +217,105 @@ function FileDetails({ file, id }: FileDetailsProps) {
             </div>
           </div>
 
-          <Button
-            className="w-full"
-            size="lg"
-            onClick={handleDownload}
-            disabled={downloading}
-          >
-            {downloading ? (
-              <>
-                <Spinner className="mr-2 h-5 w-5 animate-spin" />
-                Preparing download...
-              </>
-            ) : (
-              <>
-                <Download className="mr-2 h-5 w-5" />
-                Download
-              </>
-            )}
-          </Button>
+          {verdict === "malicious" ? (
+            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+              <div className="flex items-center gap-2 font-medium mb-1">
+                <ShieldSlash className="h-4 w-4" weight="fill" />
+                This file has been removed
+              </div>
+              <p className="text-destructive/80">
+                Our security scan detected this file as malicious. It has been flagged for deletion and is no longer available for download.
+              </p>
+            </div>
+          ) : (
+            <>
+              {(verdict === "pending" || verdict === "failed") && (
+                <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-amber-700 dark:text-amber-400">
+                  <div className="flex items-center gap-2 font-medium mb-0.5">
+                    <ShieldWarning className="h-4 w-4" weight="fill" />
+                    {requeuing ? "Re-queuing scan…" : "Verification in progress"}
+                  </div>
+                  <p className="text-amber-600/80 dark:text-amber-400/70">
+                    This file has not been verified yet. Download at your own risk.
+                  </p>
+                </div>
+              )}
+
+              <Button
+                className="w-full"
+                size="lg"
+                onClick={handleDownloadClick}
+                disabled={downloading}
+                variant={verdict === "suspicious" ? "destructive" : "default"}
+              >
+                {downloading ? (
+                  <>
+                    <Spinner className="mr-2 h-5 w-5 animate-spin" />
+                    Preparing download...
+                  </>
+                ) : (
+                  <>
+                    <Download className="mr-2 h-5 w-5" />
+                    {verdict === "suspicious" ? "Download (suspicious)" : "Download"}
+                  </>
+                )}
+              </Button>
+            </>
+          )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={suspiciousOpen} onOpenChange={setSuspiciousOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
+              <ShieldWarning className="h-5 w-5" weight="fill" />
+              Suspicious file warning
+            </AlertDialogTitle>
+            <AlertDialogDescription className="sr-only">
+              Suspicious file download confirmation
+            </AlertDialogDescription>
+            <div className="space-y-3 text-left text-sm">
+              <p className="text-muted-foreground">
+                Our security scan flagged this file as <strong className="text-foreground">suspicious</strong>. It may contain harmful content.
+              </p>
+              {reasons.length > 0 && (
+                <div className="rounded-md bg-muted p-3 text-xs font-mono space-y-1">
+                  {reasons.map((r, i) => (
+                    <div key={i} className="text-muted-foreground">{r}</div>
+                  ))}
+                </div>
+              )}
+              <p className="text-muted-foreground">
+                To confirm, type <strong className="font-mono text-foreground">{CONFIRM_PHRASE}</strong> below:
+              </p>
+              <Input
+                placeholder={CONFIRM_PHRASE}
+                value={confirmInput}
+                onChange={(e) => setConfirmInput(e.target.value)}
+                autoFocus
+              />
+            </div>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => { setSuspiciousOpen(false); setConfirmInput(""); }}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              variant="destructive"
+              disabled={confirmInput.toLowerCase() !== CONFIRM_PHRASE || downloading}
+              onClick={() => {
+                setSuspiciousOpen(false);
+                setConfirmInput("");
+                doDownload();
+              }}
+            >
+              {downloading ? <Spinner className="mr-2 h-4 w-4 animate-spin" /> : null}
+              Download anyway
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -11,7 +11,8 @@
       "@types/node": "^22.10.2",
       "@types/react": "^19.2.0",
       "@types/react-dom": "^19.2.0",
-      "@types/bun": "latest"
+      "@types/bun": "latest",
+      "bullmq": "^5.0.0"
     }
   },
   "scripts": {

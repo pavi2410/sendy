@@ -1,0 +1,1 @@
+-- baseline: files table already exists in production, nothing to run
