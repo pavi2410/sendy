@@ -6,7 +6,7 @@
     ".": "./src/index.ts"
   },
   "devDependencies": {
-    "@types/bun": "latest",
-    "typescript": "^5.7.2"
+    "@types/bun": "catalog:",
+    "typescript": "catalog:"
   }
 }

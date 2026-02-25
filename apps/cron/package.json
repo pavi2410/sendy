@@ -8,10 +8,10 @@
   "dependencies": {
     "@sendy/db": "workspace:*",
     "@sendy/storage": "workspace:*",
-    "drizzle-orm": "^0.38.3"
+    "drizzle-orm": "catalog:"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "typescript": "^5.7.2"
+    "@types/node": "catalog:",
+    "typescript": "catalog:"
   }
 }

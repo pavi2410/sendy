@@ -1,7 +1,19 @@
 {
   "name": "sendy",
   "private": true,
-  "workspaces": ["apps/*", "packages/*"],
+  "workspaces": {
+    "packages": ["apps/*", "packages/*"],
+    "catalog": {
+      "drizzle-orm": "^0.38.3",
+      "react": "^19.2.0",
+      "react-dom": "^19.2.0",
+      "typescript": "^5.7.2",
+      "@types/node": "^22.10.2",
+      "@types/react": "^19.2.0",
+      "@types/react-dom": "^19.2.0",
+      "@types/bun": "latest"
+    }
+  },
   "scripts": {
     "dev": "bun run --filter @sendy/web dev",
     "db:generate": "bun run --filter @sendy/db generate",
