@@ -1,3 +1,4 @@
+import { availableParallelism } from "node:os";
 import { Worker, type Job } from "bullmq";
 import { db, scans, files } from "@sendy/db";
 import { s3 } from "@sendy/storage";
@@ -14,8 +15,6 @@ const connection = {
   password: redisUrl.password || undefined,
   tls: redisUrl.protocol === "rediss:" ? {} : undefined,
 };
-
-const CONCURRENCY = Number(process.env.SCANNER_CONCURRENCY ?? "2");
 
 const worker = new Worker<{ fileId: string; s3Key: string }>(
   "file-scan",
@@ -69,7 +68,7 @@ const worker = new Worker<{ fileId: string; s3Key: string }>(
   },
   {
     connection,
-    concurrency: CONCURRENCY,
+    concurrency: availableParallelism(),
     stalledInterval: 30_000,
     maxStalledCount: 3,
   }
@@ -93,4 +92,5 @@ worker.on("failed", async (job: Job<{ fileId: string; s3Key: string }> | undefin
   }
 });
 
-console.log(`[scanner] Worker started (concurrency: ${CONCURRENCY})`);
+console.log(`[scanner] Worker started (concurrency: ${availableParallelism()})`);
+
