@@ -2,7 +2,7 @@ import { availableParallelism } from "node:os";
 import { Worker, type Job } from "bullmq";
 import { db, scans, files } from "@sendy/db";
 import { s3 } from "@sendy/storage";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { scanBytes } from "pompelmi";
 
 const REDIS_URL = process.env.REDIS_URL;
@@ -50,12 +50,9 @@ const worker = new Worker<{ fileId: string; s3Key: string }>(
 
     console.log(`[scanner] File ${fileId} verdict: ${verdict}`);
 
-    await db.insert(scans).values({
-      fileId,
-      verdict,
-      reasons,
-      priority: job.opts.priority ?? 0,
-    });
+    await db.update(scans)
+      .set({ verdict, reasons })
+      .where(and(eq(scans.fileId, fileId), eq(scans.verdict, "pending")));
 
     if (verdict === "suspicious") {
       const expiresAt = new Date(Date.now() + 60 * 60 * 1000);
@@ -83,12 +80,9 @@ worker.on("failed", async (job: Job<{ fileId: string; s3Key: string }> | undefin
 
   if (job && job.attemptsMade >= (job.opts.attempts ?? 3)) {
     console.error(`[scanner] Max retries reached for file ${job.data.fileId}, marking as failed`);
-    await db.insert(scans).values({
-      fileId: job.data.fileId,
-      verdict: "failed",
-      reasons: JSON.stringify([err.message]),
-      priority: job.opts.priority ?? 0,
-    });
+    await db.update(scans)
+      .set({ verdict: "failed", reasons: JSON.stringify([err.message]) })
+      .where(and(eq(scans.fileId, job.data.fileId), eq(scans.verdict, "pending")));
   }
 });
 
