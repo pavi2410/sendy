@@ -77,14 +77,14 @@ Configuration constants are in `packages/db/src/config.ts`:
 
 ## Environment Variables
 
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | PostgreSQL connection string |
-| `S3_ENDPOINT` | S3-compatible storage endpoint |
-| `S3_REGION` | S3 region (default: `auto`) |
-| `S3_ACCESS_KEY_ID` | S3 access key |
-| `S3_SECRET_ACCESS_KEY` | S3 secret key |
-| `S3_BUCKET_NAME` | S3 bucket name |
+| Variable               | Description                    |
+| ---------------------- | ------------------------------ |
+| `DATABASE_URL`         | PostgreSQL connection string   |
+| `S3_ENDPOINT`          | S3-compatible storage endpoint |
+| `S3_REGION`            | S3 region (default: `auto`)    |
+| `S3_ACCESS_KEY_ID`     | S3 access key                  |
+| `S3_SECRET_ACCESS_KEY` | S3 secret key                  |
+| `S3_BUCKET_NAME`       | S3 bucket name                 |
 
 ## License
 

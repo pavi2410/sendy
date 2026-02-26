@@ -22,11 +22,7 @@ export interface DownloadUrlOptions {
 /**
  * Generate a presigned URL for uploading a file directly to S3
  */
-export function getUploadUrl({
-  key,
-  contentType,
-  expiresIn = 3600,
-}: UploadUrlOptions): string {
+export function getUploadUrl({ key, contentType, expiresIn = 3600 }: UploadUrlOptions): string {
   return s3.presign(key, {
     method: "PUT",
     type: contentType,
@@ -37,10 +33,7 @@ export function getUploadUrl({
 /**
  * Generate a presigned URL for downloading a file from S3
  */
-export function getDownloadUrl({
-  key,
-  expiresIn = 3600,
-}: DownloadUrlOptions): string {
+export function getDownloadUrl({ key, expiresIn = 3600 }: DownloadUrlOptions): string {
   return s3.presign(key, {
     method: "GET",
     expiresIn,

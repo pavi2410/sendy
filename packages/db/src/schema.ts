@@ -17,8 +17,12 @@ export type NewFile = typeof files.$inferInsert;
 
 export const scans = pgTable("scans", {
   id: bigint("id", { mode: "number" }).generatedAlwaysAsIdentity().primaryKey(),
-  fileId: text("file_id").notNull().references(() => files.id, { onDelete: "cascade" }),
-  verdict: text("verdict").notNull().$type<"pending" | "clean" | "suspicious" | "malicious" | "failed">(),
+  fileId: text("file_id")
+    .notNull()
+    .references(() => files.id, { onDelete: "cascade" }),
+  verdict: text("verdict")
+    .notNull()
+    .$type<"pending" | "clean" | "suspicious" | "malicious" | "failed">(),
   reasons: text("reasons"),
   scannedAt: timestamp("scanned_at").defaultNow().notNull(),
   priority: integer("priority").default(0).notNull(),

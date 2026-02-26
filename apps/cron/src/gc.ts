@@ -6,10 +6,7 @@ async function garbageCollect() {
   console.log("[GC] Starting garbage collection...");
   const now = new Date();
 
-  const expiredFiles = await db
-    .select()
-    .from(files)
-    .where(lt(files.expiresAt, now));
+  const expiredFiles = await db.select().from(files).where(lt(files.expiresAt, now));
 
   console.log(`[GC] Found ${expiredFiles.length} expired files`);
 

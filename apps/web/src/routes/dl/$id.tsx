@@ -1,6 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useCallback } from "react";
-import { Download, Warning, Spinner, Shield, ShieldWarning, ShieldSlash, ShieldCheck } from "@phosphor-icons/react";
+import {
+  Download,
+  Warning,
+  Spinner,
+  Shield,
+  ShieldWarning,
+  ShieldSlash,
+  ShieldCheck,
+} from "@phosphor-icons/react";
 import prettyBytes from "pretty-bytes";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -205,15 +213,11 @@ function FileDetails({ file, initialScan, id }: FileDetailsProps) {
             </div>
             <div>
               <p className="text-muted-foreground">Uploaded</p>
-              <p className="font-medium">
-                {new Date(file.createdAt).toLocaleDateString()}
-              </p>
+              <p className="font-medium">{new Date(file.createdAt).toLocaleDateString()}</p>
             </div>
             <div>
               <p className="text-muted-foreground">Expires</p>
-              <p className="font-medium">
-                {new Date(file.expiresAt).toLocaleDateString()}
-              </p>
+              <p className="font-medium">{new Date(file.expiresAt).toLocaleDateString()}</p>
             </div>
           </div>
 
@@ -224,7 +228,8 @@ function FileDetails({ file, initialScan, id }: FileDetailsProps) {
                 This file has been removed
               </div>
               <p className="text-destructive/80">
-                Our security scan detected this file as malicious. It has been flagged for deletion and is no longer available for download.
+                Our security scan detected this file as malicious. It has been flagged for deletion
+                and is no longer available for download.
               </p>
             </div>
           ) : (
@@ -277,17 +282,22 @@ function FileDetails({ file, initialScan, id }: FileDetailsProps) {
             </AlertDialogDescription>
             <div className="space-y-3 text-left text-sm">
               <p className="text-muted-foreground">
-                Our security scan flagged this file as <strong className="text-foreground">suspicious</strong>. It may contain harmful content.
+                Our security scan flagged this file as{" "}
+                <strong className="text-foreground">suspicious</strong>. It may contain harmful
+                content.
               </p>
               {reasons.length > 0 && (
                 <div className="rounded-md bg-muted p-3 text-xs font-mono space-y-1">
                   {reasons.map((r, i) => (
-                    <div key={i} className="text-muted-foreground">{r}</div>
+                    <div key={i} className="text-muted-foreground">
+                      {r}
+                    </div>
                   ))}
                 </div>
               )}
               <p className="text-muted-foreground">
-                To confirm, type <strong className="font-mono text-foreground">{CONFIRM_PHRASE}</strong> below:
+                To confirm, type{" "}
+                <strong className="font-mono text-foreground">{CONFIRM_PHRASE}</strong> below:
               </p>
               <Input
                 placeholder={CONFIRM_PHRASE}
@@ -298,7 +308,12 @@ function FileDetails({ file, initialScan, id }: FileDetailsProps) {
             </div>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => { setSuspiciousOpen(false); setConfirmInput(""); }}>
+            <AlertDialogCancel
+              onClick={() => {
+                setSuspiciousOpen(false);
+                setConfirmInput("");
+              }}
+            >
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction

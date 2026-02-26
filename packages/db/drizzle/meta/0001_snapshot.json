@@ -72,9 +72,7 @@
         "files_short_code_unique": {
           "name": "files_short_code_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "short_code"
-          ]
+          "columns": ["short_code"]
         }
       },
       "policies": {},
@@ -141,12 +139,8 @@
           "name": "scans_file_id_files_id_fk",
           "tableFrom": "scans",
           "tableTo": "files",
-          "columnsFrom": [
-            "file_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["file_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }

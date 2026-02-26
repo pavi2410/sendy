@@ -2,7 +2,10 @@
   "name": "sendy",
   "private": true,
   "workspaces": {
-    "packages": ["apps/*", "packages/*"],
+    "packages": [
+      "apps/*",
+      "packages/*"
+    ],
     "catalog": {
       "drizzle-orm": "^0.38.3",
       "react": "^19.2.0",

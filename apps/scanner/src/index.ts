@@ -41,16 +41,15 @@ const worker = new Worker<{ fileId: string; s3Key: string }>(
     const buffer = Buffer.from(arrayBuffer);
 
     const result = await scanBytes(buffer, {
-      preset: 'balanced'
+      preset: "balanced",
     });
     const verdict = result.verdict as "clean" | "suspicious" | "malicious";
-    const reasons = result.reasons?.length
-      ? JSON.stringify(result.reasons)
-      : null;
+    const reasons = result.reasons?.length ? JSON.stringify(result.reasons) : null;
 
     console.log(`[scanner] File ${fileId} verdict: ${verdict}`);
 
-    await db.update(scans)
+    await db
+      .update(scans)
       .set({ verdict, reasons })
       .where(and(eq(scans.fileId, fileId), eq(scans.verdict, "pending")));
 
@@ -68,7 +67,7 @@ const worker = new Worker<{ fileId: string; s3Key: string }>(
     concurrency: availableParallelism(),
     stalledInterval: 30_000,
     maxStalledCount: 3,
-  }
+  },
 );
 
 worker.on("completed", (job: Job<{ fileId: string; s3Key: string }>) => {
@@ -80,11 +79,11 @@ worker.on("failed", async (job: Job<{ fileId: string; s3Key: string }> | undefin
 
   if (job && job.attemptsMade >= (job.opts.attempts ?? 3)) {
     console.error(`[scanner] Max retries reached for file ${job.data.fileId}, marking as failed`);
-    await db.update(scans)
+    await db
+      .update(scans)
       .set({ verdict: "failed", reasons: JSON.stringify([err.message]) })
       .where(and(eq(scans.fileId, job.data.fileId), eq(scans.verdict, "pending")));
   }
 });
 
 console.log(`[scanner] Worker started (concurrency: ${availableParallelism()})`);
-

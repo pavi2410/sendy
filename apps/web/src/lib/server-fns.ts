@@ -27,7 +27,7 @@ export const getPresignedUploadUrl = createServerFn({ method: "POST" })
       contentType: string;
       size: number;
       expirationDays?: number;
-    }) => data
+    }) => data,
   )
   .handler(async ({ data }) => {
     const { id, fileName, contentType, size, expirationDays } = data;
@@ -58,7 +58,11 @@ export const getPresignedUploadUrl = createServerFn({ method: "POST" })
     await db.insert(scans).values({ fileId: id, verdict: "pending" });
 
     try {
-      await scanQueue?.add("scan", { fileId: id, s3Key }, { attempts: 3, backoff: { type: "exponential", delay: 5000 } });
+      await scanQueue?.add(
+        "scan",
+        { fileId: id, s3Key },
+        { attempts: 3, backoff: { type: "exponential", delay: 5000 } },
+      );
     } catch (err) {
       console.error("[queue] Failed to enqueue scan job:", err);
     }
@@ -81,7 +85,7 @@ export const getFileMetadata = createServerFn({ method: "GET" })
       where: isValidShortCode(trimmedId)
         ? or(
             eq(files.id, trimmedId),
-            and(isNotNull(files.shortCode), eq(files.shortCode, upperCaseId))
+            and(isNotNull(files.shortCode), eq(files.shortCode, upperCaseId)),
           )
         : eq(files.id, trimmedId),
     });
@@ -117,7 +121,7 @@ export const getPresignedDownloadUrl = createServerFn({ method: "GET" })
       where: isValidShortCode(trimmedId)
         ? or(
             eq(files.id, trimmedId),
-            and(isNotNull(files.shortCode), eq(files.shortCode, upperCaseId))
+            and(isNotNull(files.shortCode), eq(files.shortCode, upperCaseId)),
           )
         : eq(files.id, trimmedId),
     });
@@ -168,7 +172,7 @@ export const requeueScan = createServerFn({ method: "POST" })
       await scanQueue?.add(
         "scan",
         { fileId: file.id, s3Key: file.s3Key },
-        { priority: 1, attempts: 3, backoff: { type: "exponential", delay: 5000 } }
+        { priority: 1, attempts: 3, backoff: { type: "exponential", delay: 5000 } },
       );
     } catch (err) {
       console.error("[queue] Failed to requeue scan job:", err);

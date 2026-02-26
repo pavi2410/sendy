@@ -46,9 +46,7 @@ function FileLookup() {
     <Card>
       <CardHeader>
         <CardTitle>Retrieve a file</CardTitle>
-        <CardDescription>
-          Enter the 3-word code or 6-digit shortcode
-        </CardDescription>
+        <CardDescription>Enter the 3-word code or 6-digit shortcode</CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="flex gap-2">
@@ -66,7 +64,13 @@ function FileLookup() {
   );
 }
 
-function UploadForm({ id, onSuccess }: { id: string; onSuccess: (result: { shortCode: string }) => void }) {
+function UploadForm({
+  id,
+  onSuccess,
+}: {
+  id: string;
+  onSuccess: (result: { shortCode: string }) => void;
+}) {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [expirationDays, setExpirationDays] = useState(DEFAULT_EXPIRATION_DAYS);
@@ -107,7 +111,7 @@ function UploadForm({ id, onSuccess }: { id: string; onSuccess: (result: { short
         setUploading(false);
       }
     },
-    [id, expirationDays, onSuccess]
+    [id, expirationDays, onSuccess],
   );
 
   const handleDrop = useCallback(
@@ -117,16 +121,14 @@ function UploadForm({ id, onSuccess }: { id: string; onSuccess: (result: { short
       const file = e.dataTransfer.files[0];
       if (file) handleFile(file);
     },
-    [handleFile]
+    [handleFile],
   );
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Upload a file</CardTitle>
-        <CardDescription>
-          Share files anonymously. Max size: {MAX_FILE_SIZE_MB}MB
-        </CardDescription>
+        <CardDescription>Share files anonymously. Max size: {MAX_FILE_SIZE_MB}MB</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div
@@ -160,12 +162,8 @@ function UploadForm({ id, onSuccess }: { id: string; onSuccess: (result: { short
           ) : (
             <>
               <Upload className="mb-4 h-12 w-12 text-muted-foreground" />
-              <p className="text-lg font-medium">
-                Drop a file here or click to select
-              </p>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Or paste from clipboard (Ctrl+V)
-              </p>
+              <p className="text-lg font-medium">Drop a file here or click to select</p>
+              <p className="mt-2 text-sm text-muted-foreground">Or paste from clipboard (Ctrl+V)</p>
             </>
           )}
         </div>
@@ -223,11 +221,7 @@ function UploadSuccess({ id, shortCode }: { id: string; shortCode: string }) {
           <div className="flex gap-2">
             <Input value={wordUrl} readOnly />
             <Button variant="outline" size="icon" onClick={copyWordUrl}>
-              {copiedWord ? (
-                <Check className="h-4 w-4" />
-              ) : (
-                <Copy className="h-4 w-4" />
-              )}
+              {copiedWord ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             </Button>
           </div>
         </div>
@@ -237,11 +231,7 @@ function UploadSuccess({ id, shortCode }: { id: string; shortCode: string }) {
           <div className="flex gap-2">
             <Input value={codeUrl} readOnly />
             <Button variant="outline" size="icon" onClick={copyCodeUrl}>
-              {copiedCode ? (
-                <Check className="h-4 w-4" />
-              ) : (
-                <Copy className="h-4 w-4" />
-              )}
+              {copiedCode ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
             </Button>
           </div>
           <p className="text-xs text-muted-foreground">6-digit code: {shortCode}</p>
