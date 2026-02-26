@@ -19,6 +19,12 @@
     "dev": "bun run --filter @sendy/web dev",
     "db:generate": "bun run --filter @sendy/db generate",
     "db:migrate": "bun run --filter @sendy/db migrate",
-    "db:push": "bun run --filter @sendy/db push"
+    "db:push": "bun run --filter @sendy/db push",
+    "lint": "oxlint",
+    "format": "oxfmt"
+  },
+  "devDependencies": {
+    "oxfmt": "^0.35.0",
+    "oxlint": "^1.50.0"
   }
 }
