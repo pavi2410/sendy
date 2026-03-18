@@ -13,14 +13,24 @@ export function Footer() {
             pavi2410
           </a>
         </p>
-        <a
-          href="https://github.com/pavi2410/sendy"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm text-muted-foreground hover:text-foreground"
-        >
-          Source
-        </a>
+        <div className="flex items-center gap-3">
+          <a
+            href={`https://github.com/pavi2410/sendy/commit/${__COMMIT_HASH__}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="font-mono text-xs text-muted-foreground hover:text-foreground"
+          >
+            {__COMMIT_HASH__}
+          </a>
+          <a
+            href="https://github.com/pavi2410/sendy"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
+            Source
+          </a>
+        </div>
       </div>
     </footer>
   );

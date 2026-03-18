@@ -5,8 +5,14 @@ import viteReact from "@vitejs/plugin-react";
 import viteTsConfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import { nitro } from "nitro/vite";
+import { execSync } from "node:child_process";
+
+const commitHash = execSync("git rev-parse --short HEAD").toString().trim();
 
 const config = defineConfig({
+  define: {
+    __COMMIT_HASH__: JSON.stringify(commitHash),
+  },
   plugins: [
     devtools(),
     nitro({ preset: "bun" }),
