@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   Download,
   Warning,
@@ -128,6 +128,7 @@ function FileDetails({ file, initialScan, id }: FileDetailsProps) {
   const [requeuing, setRequeuing] = useState(false);
   const [suspiciousOpen, setSuspiciousOpen] = useState(false);
   const [confirmInput, setConfirmInput] = useState("");
+  const requeuedForScanRef = useRef<number | null>(null);
 
   const verdict: Verdict = (scan?.verdict as Verdict) ?? "pending";
   const isTerminal = verdict === "clean" || verdict === "suspicious" || verdict === "malicious";
@@ -149,11 +150,12 @@ function FileDetails({ file, initialScan, id }: FileDetailsProps) {
     if (!scan) return;
     const age = Date.now() - new Date(scan.scannedAt).getTime();
     if (age < STALE_THRESHOLD_MS) return;
-    if (requeuing) return;
+    if (requeuedForScanRef.current === scan.id) return;
 
+    requeuedForScanRef.current = scan.id;
     setRequeuing(true);
     requeueScan({ data: id }).finally(() => setRequeuing(false));
-  }, [verdict, scan, id, requeuing]);
+  }, [verdict, scan, id]);
 
   const doDownload = async () => {
     setDownloading(true);
