@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, integer, bigint } from "drizzle-orm/pg-core";
+import { bigint, integer, pgTable, text, timestamp } from "drizzle-orm/pg-core";
 
 export const files = pgTable("files", {
   id: text("id").primaryKey(),

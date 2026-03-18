@@ -1,8 +1,9 @@
 import { availableParallelism } from "node:os";
-import { Worker, type Job } from "bullmq";
-import { db, scans, files } from "@sendy/db";
+import { Worker } from 'bullmq';
+import type { Job } from 'bullmq';
+import { db, files, scans } from "@sendy/db";
 import { s3 } from "@sendy/storage";
-import { eq, and } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { scanBytes } from "pompelmi";
 
 const REDIS_URL = process.env.REDIS_URL;

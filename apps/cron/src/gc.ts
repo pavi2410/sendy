@@ -1,6 +1,6 @@
 import { db, files } from "@sendy/db";
 import { deleteFile } from "@sendy/storage";
-import { lt, eq } from "drizzle-orm";
+import { eq, lt } from "drizzle-orm";
 
 async function garbageCollect() {
   console.log("[GC] Starting garbage collection...");

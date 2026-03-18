@@ -1,13 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Download,
-  Warning,
-  Spinner,
   Shield,
-  ShieldWarning,
-  ShieldSlash,
   ShieldCheck,
+  ShieldSlash,
+  ShieldWarning,
+  Spinner,
+  Warning,
 } from "@phosphor-icons/react";
 import prettyBytes from "pretty-bytes";
 import { Button } from "@/components/ui/button";
@@ -15,16 +15,16 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogHeader,
-  AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogCancel,
-  AlertDialogAction,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { getFileMetadata, getPresignedDownloadUrl, requeueScan } from "@/lib/server-fns";
-import type { Scan, File } from "@sendy/db";
+import type { File, Scan } from "@sendy/db";
 
 const STALE_THRESHOLD_MS = 30_000;
 const POLL_INTERVAL_MS = 2_000;

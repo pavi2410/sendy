@@ -1,13 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useState, useMemo, useCallback } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useCallback, useMemo, useState } from "react";
 import { generate } from "random-words";
-import { Copy, Check, Upload, Spinner, ArrowRight } from "@phosphor-icons/react";
+import { ArrowRight, Check, Copy, Spinner, Upload } from "@phosphor-icons/react";
 import QRCode from "react-qr-code";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { getPresignedUploadUrl } from "@/lib/server-fns";
-import { useNavigate } from "@tanstack/react-router";
-import { MAX_FILE_SIZE_MB, MAX_FILE_SIZE_BYTES, DEFAULT_EXPIRATION_DAYS } from "@sendy/db/config";
+import { DEFAULT_EXPIRATION_DAYS, MAX_FILE_SIZE_BYTES, MAX_FILE_SIZE_MB } from "@sendy/db/config";
 
 export const Route = createFileRoute("/")({ component: UploadPage });
 
@@ -110,7 +109,10 @@ function UploadForm({
               setUploadProgress(Math.round((e.loaded / e.total) * 100));
             }
           };
-          xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`Upload failed with status ${xhr.status}`)));
+          xhr.onload = () =>
+            xhr.status >= 200 && xhr.status < 300
+              ? resolve()
+              : reject(new Error(`Upload failed with status ${xhr.status}`));
           xhr.onerror = () => reject(new Error("Upload failed"));
           xhr.send(file);
         });
@@ -141,7 +143,9 @@ function UploadForm({
     <div className="flex flex-col gap-3">
       <div>
         <h2 className="text-sm font-medium text-foreground">Upload</h2>
-        <p className="text-xs text-muted-foreground">Share anonymously · Max {MAX_FILE_SIZE_MB}MB</p>
+        <p className="text-xs text-muted-foreground">
+          Share anonymously · Max {MAX_FILE_SIZE_MB}MB
+        </p>
       </div>
 
       <div
