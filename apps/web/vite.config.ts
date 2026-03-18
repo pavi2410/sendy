@@ -5,9 +5,7 @@ import viteReact from "@vitejs/plugin-react";
 import viteTsConfigPaths from "vite-tsconfig-paths";
 import tailwindcss from "@tailwindcss/vite";
 import { nitro } from "nitro/vite";
-import { execSync } from "node:child_process";
-
-const commitHash = execSync("git rev-parse --short HEAD").toString().trim();
+const commitHash = (process.env.RAILWAY_GIT_COMMIT_SHA ?? "dev").slice(0, 7);
 
 const config = defineConfig({
   define: {

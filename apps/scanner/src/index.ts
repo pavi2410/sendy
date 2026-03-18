@@ -1,6 +1,6 @@
 import { availableParallelism } from "node:os";
-import { Worker } from 'bullmq';
-import type { Job } from 'bullmq';
+import { Worker } from "bullmq";
+import type { Job } from "bullmq";
 import { db, files, scans } from "@sendy/db";
 import { s3 } from "@sendy/storage";
 import { and, eq } from "drizzle-orm";
