@@ -11,7 +11,6 @@ import {
 } from "@phosphor-icons/react";
 import prettyBytes from "pretty-bytes";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -54,23 +53,15 @@ function DownloadPage() {
 
 function ErrorState({ message }: { message: string }) {
   return (
-    <div className="container mx-auto max-w-md py-12 px-4">
-      <Card className="border-destructive">
-        <CardHeader>
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-destructive/10">
-              <Warning className="h-6 w-6 text-destructive" weight="bold" />
-            </div>
-            <CardTitle>File not found</CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">{message}</p>
-          <p className="mt-4 text-sm text-muted-foreground">
-            The file may have expired or the link is invalid.
-          </p>
-        </CardContent>
-      </Card>
+    <div className="flex h-full items-center justify-center px-6">
+      <div className="w-full max-w-sm space-y-4 text-center">
+        <Warning className="mx-auto h-8 w-8 text-muted-foreground" weight="bold" />
+        <h2 className="text-base font-medium">File not found</h2>
+        <p className="text-sm text-muted-foreground">{message}</p>
+        <p className="text-xs text-muted-foreground">
+          The file may have expired or the link is invalid.
+        </p>
+      </div>
     </div>
   );
 }
@@ -185,92 +176,90 @@ function FileDetails({ file, initialScan, id }: FileDetailsProps) {
   const reasons: string[] = scan?.reasons ? JSON.parse(scan.reasons) : [];
 
   return (
-    <div className="container mx-auto max-w-md py-12 px-4">
-      <Card>
-        <CardHeader>
-          <CardTitle className="break-all">{file.originalName}</CardTitle>
-          <div className="pt-1">
+    <div className="flex h-full items-center justify-center px-6">
+      <div className="w-full max-w-sm space-y-5">
+        <div>
+          <h2 className="text-base font-medium break-all">{file.originalName}</h2>
+          <div className="mt-1.5">
             <VerdictBadge verdict={verdict} />
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-2 gap-4 text-sm">
+        </div>
+
+        <div className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+          <div>
+            <p className="text-xs text-muted-foreground">3-Word Code</p>
+            <p className="font-medium font-mono text-sm">{file.id}</p>
+          </div>
+          {file.shortCode && (
             <div>
-              <p className="text-muted-foreground">3-Word Code</p>
-              <p className="font-medium font-mono">{file.id}</p>
+              <p className="text-xs text-muted-foreground">Shortcode</p>
+              <p className="font-medium font-mono text-sm">{file.shortCode}</p>
             </div>
-            {file.shortCode && (
-              <div>
-                <p className="text-muted-foreground">Shortcode</p>
-                <p className="font-medium font-mono">{file.shortCode}</p>
+          )}
+          <div>
+            <p className="text-xs text-muted-foreground">Size</p>
+            <p className="font-medium text-sm">{prettyBytes(file.size)}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Type</p>
+            <p className="font-medium text-sm">{file.contentType}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Uploaded</p>
+            <p className="font-medium text-sm">{new Date(file.createdAt).toLocaleDateString()}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Expires</p>
+            <p className="font-medium text-sm">{new Date(file.expiresAt).toLocaleDateString()}</p>
+          </div>
+        </div>
+
+        {verdict === "malicious" ? (
+          <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">
+            <div className="flex items-center gap-2 font-medium mb-1">
+              <ShieldSlash className="h-4 w-4" weight="fill" />
+              This file has been removed
+            </div>
+            <p className="text-xs text-destructive/80">
+              Our security scan detected this file as malicious. It has been flagged for deletion
+              and is no longer available for download.
+            </p>
+          </div>
+        ) : (
+          <>
+            {(verdict === "pending" || verdict === "failed") && (
+              <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-amber-700 dark:text-amber-400">
+                <div className="flex items-center gap-2 font-medium mb-0.5 text-xs">
+                  <ShieldWarning className="h-4 w-4" weight="fill" />
+                  {requeuing ? "Re-queuing scan…" : "Verification in progress"}
+                </div>
+                <p className="text-xs text-amber-600/80 dark:text-amber-400/70">
+                  This file has not been verified yet. Download at your own risk.
+                </p>
               </div>
             )}
-            <div>
-              <p className="text-muted-foreground">Size</p>
-              <p className="font-medium">{prettyBytes(file.size)}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Type</p>
-              <p className="font-medium">{file.contentType}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Uploaded</p>
-              <p className="font-medium">{new Date(file.createdAt).toLocaleDateString()}</p>
-            </div>
-            <div>
-              <p className="text-muted-foreground">Expires</p>
-              <p className="font-medium">{new Date(file.expiresAt).toLocaleDateString()}</p>
-            </div>
-          </div>
 
-          {verdict === "malicious" ? (
-            <div className="rounded-lg border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
-              <div className="flex items-center gap-2 font-medium mb-1">
-                <ShieldSlash className="h-4 w-4" weight="fill" />
-                This file has been removed
-              </div>
-              <p className="text-destructive/80">
-                Our security scan detected this file as malicious. It has been flagged for deletion
-                and is no longer available for download.
-              </p>
-            </div>
-          ) : (
-            <>
-              {(verdict === "pending" || verdict === "failed") && (
-                <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-amber-700 dark:text-amber-400">
-                  <div className="flex items-center gap-2 font-medium mb-0.5">
-                    <ShieldWarning className="h-4 w-4" weight="fill" />
-                    {requeuing ? "Re-queuing scan…" : "Verification in progress"}
-                  </div>
-                  <p className="text-amber-600/80 dark:text-amber-400/70">
-                    This file has not been verified yet. Download at your own risk.
-                  </p>
-                </div>
+            <Button
+              className="w-full"
+              onClick={handleDownloadClick}
+              disabled={downloading}
+              variant={verdict === "suspicious" ? "destructive" : "default"}
+            >
+              {downloading ? (
+                <>
+                  <Spinner className="mr-2 h-4 w-4 animate-spin" />
+                  Preparing download...
+                </>
+              ) : (
+                <>
+                  <Download className="mr-2 h-4 w-4" />
+                  {verdict === "suspicious" ? "Download (suspicious)" : "Download"}
+                </>
               )}
-
-              <Button
-                className="w-full"
-                size="lg"
-                onClick={handleDownloadClick}
-                disabled={downloading}
-                variant={verdict === "suspicious" ? "destructive" : "default"}
-              >
-                {downloading ? (
-                  <>
-                    <Spinner className="mr-2 h-5 w-5 animate-spin" />
-                    Preparing download...
-                  </>
-                ) : (
-                  <>
-                    <Download className="mr-2 h-5 w-5" />
-                    {verdict === "suspicious" ? "Download (suspicious)" : "Download"}
-                  </>
-                )}
-              </Button>
-            </>
-          )}
-        </CardContent>
-      </Card>
+            </Button>
+          </>
+        )}
+      </div>
 
       <AlertDialog open={suspiciousOpen} onOpenChange={setSuspiciousOpen}>
         <AlertDialogContent>
