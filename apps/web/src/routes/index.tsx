@@ -72,6 +72,7 @@ function UploadForm({
   onSuccess: (result: { shortCode: string }) => void;
 }) {
   const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [dragOver, setDragOver] = useState(false);
   const [expirationDays, setExpirationDays] = useState(DEFAULT_EXPIRATION_DAYS);
 
@@ -83,6 +84,7 @@ function UploadForm({
       }
 
       setUploading(true);
+      setUploadProgress(0);
 
       try {
         const { uploadUrl, shortCode } = await getPresignedUploadUrl({
@@ -95,12 +97,18 @@ function UploadForm({
           },
         });
 
-        await fetch(uploadUrl, {
-          method: "PUT",
-          body: file,
-          headers: {
-            "Content-Type": file.type || "application/octet-stream",
-          },
+        await new Promise<void>((resolve, reject) => {
+          const xhr = new XMLHttpRequest();
+          xhr.open("PUT", uploadUrl);
+          xhr.setRequestHeader("Content-Type", file.type || "application/octet-stream");
+          xhr.upload.onprogress = (e) => {
+            if (e.lengthComputable) {
+              setUploadProgress(Math.round((e.loaded / e.total) * 100));
+            }
+          };
+          xhr.onload = () => (xhr.status >= 200 && xhr.status < 300 ? resolve() : reject(new Error(`Upload failed with status ${xhr.status}`)));
+          xhr.onerror = () => reject(new Error("Upload failed"));
+          xhr.send(file);
         });
 
         onSuccess({ shortCode });
@@ -109,6 +117,7 @@ function UploadForm({
         alert("Upload failed. Please try again.");
       } finally {
         setUploading(false);
+        setUploadProgress(0);
       }
     },
     [id, expirationDays, onSuccess],
@@ -155,10 +164,16 @@ function UploadForm({
             }}
           />
           {uploading ? (
-            <>
-              <Spinner className="mb-4 h-12 w-12 animate-spin text-muted-foreground" />
-              <p className="text-lg font-medium">Uploading...</p>
-            </>
+            <div className="flex w-full flex-col items-center gap-4">
+              <Spinner className="h-12 w-12 animate-spin text-muted-foreground" />
+              <p className="text-lg font-medium">Uploading... {uploadProgress}%</p>
+              <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-primary transition-all duration-200"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            </div>
           ) : (
             <>
               <Upload className="mb-4 h-12 w-12 text-muted-foreground" />
